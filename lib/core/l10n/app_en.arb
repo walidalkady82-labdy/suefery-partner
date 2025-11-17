@@ -77,5 +77,6 @@
     "nameCannotBeEmpty": "Name cannot be empty",
     "priceInvalid": "Please enter a valid price",
     "editProduct": "Edit Product",
-    "update": "Update"
+    "update": "Update",
+    "search" : "Search"
 }

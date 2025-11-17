@@ -110,19 +110,51 @@ class RepoFirestore implements IRepoFirestore {
   @override
   Stream<QuerySnapshot<Map<String, dynamic>>> getCollectionStream(
     String collectionPath, {
-    String? orderBy,
-    bool isDescending = false,
+    List<QueryCondition>? where,  
+    List<OrderBy>? orderBy,
+    int? limit,
   }) {
-    // Start with the basic query
     Query<Map<String, dynamic>> query = _firestore.collection(collectionPath);
 
-    // Add sorting if provided
-    if (orderBy != null) {
-      query = query.orderBy(orderBy, descending: isDescending);
+    // Apply where clauses
+    if (where != null) {
+      for (var condition in where) {
+        if (condition.isEqualTo != null) {
+          query = query.where(condition.field, isEqualTo: condition.isEqualTo);
+        } else if (condition.isLessThan != null) {
+          query = query.where(condition.field, isLessThan: condition.isLessThan);
+        } else if (condition.isLessThanOrEqualTo != null) {
+          query = query.where(condition.field, isLessThanOrEqualTo: condition.isLessThanOrEqualTo);
+        } else if (condition.isGreaterThan != null) {
+          query = query.where(condition.field, isGreaterThan: condition.isGreaterThan);
+        } else if (condition.isGreaterThanOrEqualTo != null) {
+          query = query.where(condition.field, isGreaterThanOrEqualTo: condition.isGreaterThanOrEqualTo);
+        } else if (condition.arrayContains != null) {
+          query = query.where(condition.field, arrayContains: condition.arrayContains);
+        } else if (condition.arrayContainsAny != null) {
+          query = query.where(condition.field, arrayContainsAny: condition.arrayContainsAny);
+        } else if (condition.whereIn != null) {
+          query = query.where(condition.field, whereIn: condition.whereIn);
+        } else if (condition.isNull != null) {
+          query = query.where(condition.field, isNull: condition.isNull);
+        }
+      }
     }
 
-    // Return the stream of snapshots
-    return query.snapshots();
+    // Apply orderBy clauses
+    if (orderBy != null) {
+      for (var order in orderBy) {
+        query = query.orderBy(order.field, descending: order.descending);
+      }
+    }
+
+    // Apply limit clause
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+    final stream = query.snapshots();
+    
+    return stream;
   }
 
   @override

@@ -38,6 +38,9 @@ class OrderBy {
 /// An abstract interface for interacting with Firestore.
 /// This allows for easy mocking and swapping of Firestore implementations.
 abstract class IRepoFirestore {
+
+  String generateId(String path) ;
+
   /// Fetches a collection of documents from Firestore.
   ///
   /// [collectionPath] The path to the collection.
@@ -50,28 +53,22 @@ abstract class IRepoFirestore {
     List<OrderBy>? orderBy,
     int? limit,
   });
-
+  Stream<QuerySnapshot<Map<String, dynamic>>> getCollectionStream(
+    String collectionPath, {
+    List<QueryCondition>? where,  
+    List<OrderBy>? orderBy,
+    int? limit,
+  });
   /// Updates a specific document in a collection.
-  Future<void> updateDocument(
-      String collectionPath, String documentId, Map<String, dynamic> data);
+  Future<void> updateDocument(String collectionPath, String documentId, Map<String, dynamic> data);
 
   Future<void> remove(String path, String id);
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> getDocumentStream(
-      String collectionPath, String docId);
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getDocumentStream(String collectionPath, String docId);
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> getDocumentSnapShot(
-      String collectionPath, String docId);
+  Future<DocumentSnapshot<Map<String, dynamic>>> getDocumentSnapShot(String collectionPath, String docId);
   
   Future<void> addDocument(String collectionPath, Map<String, dynamic> data) ;
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> getCollectionStream(
-    String collectionPath, {
-    String? orderBy,
-    bool isDescending = false,
-  });
-
-  String generateId(String path) ;
 
 }
 

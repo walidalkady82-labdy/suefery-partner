@@ -7,7 +7,8 @@ import 'package:suefery_partner/data/enums/order_status.dart';
 class OrderModel extends Equatable {
   final String id; 
   final String customerId; 
-  final String? riderId;
+  final String partnerId; 
+  final String riderId;
   final double total;
   final OrderStatus status;
   final List<OrderItem> items;
@@ -17,7 +18,8 @@ class OrderModel extends Equatable {
   const OrderModel({
     required this.id,
     required this.customerId,
-    this.riderId,
+    required this.partnerId,
+    required this.riderId,
     required this.total,
     required this.status,
     required this.items,
@@ -26,13 +28,14 @@ class OrderModel extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, customerId, riderId, status, items, createdAt];
+  List<Object?> get props => [id, customerId,partnerId, riderId, status, items, createdAt];
 
   factory OrderModel.fromMap(Map<String, dynamic> map) {
     return OrderModel(
       id: map['id'] as String,
       customerId: map['userId'] as String,
-      riderId: map['riderId'] as String?,
+      partnerId: map['partnerId'] as String,
+      riderId: map['riderId'] as String,
       total: (map['estimatedTotal'] as num).toDouble(),
       status: OrderStatus.values
           .firstWhere((e) => e.name == map['status'], orElse: () => OrderStatus.draft),
@@ -47,6 +50,7 @@ class OrderModel extends Equatable {
   OrderModel copyWith({
     String? id,
     String? customerId,
+    String? partnerId,
     String? riderId,
     double? total,
     OrderStatus? status,
@@ -57,6 +61,7 @@ class OrderModel extends Equatable {
     return OrderModel(
       id: id ?? this.id,
       customerId: customerId ?? this.customerId,
+      partnerId: partnerId ?? this.partnerId,
       riderId: riderId ?? this.riderId,
       total: total ?? this.total,
       status: status ?? this.status,

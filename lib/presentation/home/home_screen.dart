@@ -7,6 +7,7 @@ import '../../data/models/order_model.dart';
 import 'edit_product_modal.dart';
 import '../auth/auth_cubit.dart';
 import 'add_product_modal.dart';
+import 'scroll_behavior.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -50,6 +51,8 @@ class OrderManagementTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.l10n;
+    final homeCubit = context.read<HomeCubit>();
+   
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
         if (state.isLoading && state.orders.isEmpty) {
@@ -68,7 +71,7 @@ class OrderManagementTab extends StatelessWidget {
         }
 
         return RefreshIndicator(
-          onRefresh: () => context.read<HomeCubit>().fetchOrders(),
+          onRefresh: () => homeCubit.fetchOrders(),
           child: ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
@@ -172,50 +175,69 @@ class InventoryManagementTab extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state.error.isNotEmpty) {
-            return Center(child: Text(state.error));
-          }
-
-          if (state.products.isEmpty && !state.isLoading) {
+          if (state.products.isEmpty && !state.isLoading && state.error.isEmpty) {
             return Center(child: Text(strings.welcome)); // Or a more specific "No products yet" message
           }
 
-          return RefreshIndicator(
-            onRefresh: () => context.read<HomeCubit>().fetchInventory(),
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: state.products.length,
-              itemBuilder: (context, index) {
-                final product = state.products[index];
-                return Card(
-                  child: ListTile(
-                    title: Text(product.description), // Note: Your model uses 'description' for the name
-                    subtitle: Text('${product.price.toStringAsFixed(2)} EGP'),
-                    leading: Switch(
-                      value: product.isAvailable,
-                      onChanged: (newValue) {
-                        context.read<HomeCubit>().toggleAvailability(product.productId, newValue);
-                      },
-                      activeColor: Colors.green,
-                      inactiveThumbColor: Colors.red,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.edit_outlined),
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) => BlocProvider.value(
-                            value: context.read<HomeCubit>(),
-                            child: EditProductModal(product: product),
-                          ),
-                        );
-                      },
+          final filteredProducts = state.filteredProducts;
+
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  onChanged: (query) => context.read<HomeCubit>().searchInventory(query),
+                  decoration: InputDecoration(
+                    labelText: strings.search,
+                    prefixIcon: const Icon(Icons.search),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              if (state.error.isNotEmpty)
+                Center(child: Text(state.error))
+              else
+                Expanded(
+                  child: ScrollConfiguration(
+                    behavior: AppScrollBehavior(),
+                    child: RefreshIndicator(
+                      onRefresh: () => context.read<HomeCubit>().fetchInventory(),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        itemCount: filteredProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = filteredProducts[index];
+                          return Card(
+                            child: ListTile(
+                              title: Text(product.description),
+                              subtitle: Text('${product.price.toStringAsFixed(2)} EGP'),
+                              leading: Switch(
+                                value: product.isAvailable,
+                                onChanged: (newValue) {
+                                  context.read<HomeCubit>().toggleAvailability(product.productId, newValue);
+                                },
+                                activeColor: Colors.green,
+                                inactiveThumbColor: Colors.red,
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.edit_outlined),
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    builder: (_) => BlocProvider.value(
+                                      value: context.read<HomeCubit>(),
+                                      child: EditProductModal(product: product),
+                                    ));
+                                },
+                              ),
+                            ));
+                        },
+                      ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+            ],
           );
         },
       ),

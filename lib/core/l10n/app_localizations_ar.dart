@@ -202,4 +202,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get update => 'تحديث';
+
+  @override
+  String get search => 'بحث';
 }

@@ -71,6 +71,7 @@
     "nameCannotBeEmpty": "لا يمكن أن يكون الاسم فارغًا",
     "priceInvalid": "الرجاء إدخال سعر صحيح",
         "editProduct": "تعديل المنتج",
-    "update": "تحديث"
+    "update": "تحديث",
+    "search" : "بحث"
 
 }
