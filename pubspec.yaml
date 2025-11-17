@@ -37,3 +37,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/images/
+    - assets/.env
+  fonts:
+    - family: Cairo
+      fonts:
+      - asset: assets/fonts/Cairo-Regular.ttf
