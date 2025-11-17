@@ -13,13 +13,13 @@ class AddProductModal extends StatefulWidget {
 
 class _AddProductModalState extends State<AddProductModal> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final _brandController = TextEditingController();
   final _priceController = TextEditingController();
   final _descriptionController = TextEditingController();
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _brandController.dispose();
     _priceController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -35,6 +35,7 @@ class _AddProductModalState extends State<AddProductModal> {
         partnerId: homeCubit.currentUserId,
         price: double.tryParse(_priceController.text) ?? 0.0,
         description: _descriptionController.text,
+        brand: _brandController.text,
         isAvailable: true, // Default to available
       );
 
@@ -63,7 +64,7 @@ class _AddProductModalState extends State<AddProductModal> {
               Text(strings.addProduct, style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 24),
               TextFormField(
-                controller: _nameController,
+                controller: _brandController,
                 decoration: InputDecoration(labelText: strings.productNameHint),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {

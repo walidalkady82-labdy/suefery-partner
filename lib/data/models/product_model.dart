@@ -3,6 +3,7 @@ class ProductModel {
   final String productId;
   final String partnerId; 
   final String description;
+  final String brand;
   final double price;
   bool isAvailable; // The partner controls this
 
@@ -10,6 +11,7 @@ class ProductModel {
     required this.productId,
     required this.partnerId,
     required this.description,
+    required this.brand,
     required this.price,
     this.isAvailable = true,
   });
@@ -17,7 +19,8 @@ class ProductModel {
     return ProductModel(
       productId: map['productId'] as String,
       partnerId: map['partnerId'] as String,
-      description: map['name'] as String,
+      description: map['description'] as String,
+      brand: map['brand'] as String,
       price: (map['price'] as num).toDouble(),
       isAvailable: map['isAvailable'] as bool,
     );
@@ -27,6 +30,7 @@ class ProductModel {
     String? productId,
     String? partnerId,
     String? description,
+    String? brand,
     double? price,
     bool? isAvailable,
   }) {
@@ -34,6 +38,7 @@ class ProductModel {
       productId: productId ?? this.productId,
       partnerId: partnerId ?? this.partnerId,
       description: description ?? this.description,
+      brand: brand ?? this.brand,
       price: price ?? this.price,
       isAvailable: isAvailable ?? this.isAvailable,
     );
@@ -42,7 +47,8 @@ class ProductModel {
         return {
       'productId': productId,
       'partnerId': partnerId,
-      'name': description,
+      'description': description,
+      'brand': brand,
       'price': price,
       'isAvailable': isAvailable
     };

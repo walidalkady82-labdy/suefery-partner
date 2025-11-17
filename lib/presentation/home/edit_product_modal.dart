@@ -14,21 +14,21 @@ class EditProductModal extends StatefulWidget {
 
 class _EditProductModalState extends State<EditProductModal> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
+  late TextEditingController _brandController;
   late TextEditingController _priceController;
   late TextEditingController _descriptionController;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.product.description);
+    _brandController = TextEditingController(text: widget.product.description);
     _priceController = TextEditingController(text: widget.product.price.toString());
     _descriptionController = TextEditingController(text: ''); // Assuming description is not a field yet
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _brandController.dispose();
     _priceController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -37,9 +37,9 @@ class _EditProductModalState extends State<EditProductModal> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       final updatedProduct = widget.product.copyWith(
-        description: _nameController.text,
+        brand: _brandController.text,
         price: double.tryParse(_priceController.text) ?? widget.product.price,
-        // description: _descriptionController.text, // Uncomment when you add description field
+        description: _descriptionController.text, // Uncomment when you add description field
       );
 
       context.read<HomeCubit>().updateProduct(updatedProduct);
@@ -67,7 +67,7 @@ class _EditProductModalState extends State<EditProductModal> {
               Text(strings.editProduct, style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 24),
               TextFormField(
-                controller: _nameController,
+                controller: _brandController,
                 decoration: InputDecoration(labelText: strings.productNameHint),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
