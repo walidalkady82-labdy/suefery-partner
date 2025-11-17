@@ -6,6 +6,7 @@ import 'package:suefery_partner/data/models/user_model.dart';
 import 'package:suefery_partner/data/services/auth_service.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 import 'package:suefery_partner/locator.dart';
+import 'package:suefery_partner/presentation/home/home_screen.dart';
 
 final _log = LoggerRepo('LoginState');
 
@@ -230,4 +231,5 @@ class AuthCubit extends Cubit<AuthState> {
       }
     }
 }
+
 }

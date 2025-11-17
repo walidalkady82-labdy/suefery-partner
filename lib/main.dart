@@ -13,6 +13,7 @@ import 'package:suefery_partner/locator.dart';
 import 'package:suefery_partner/presentation/home/home_cubit.dart';
 
 import 'firebase_options.dart';
+import 'presentation/auth/auth_checker.dart';
 import 'presentation/auth/auth_cubit.dart';
 import 'presentation/auth/auth_wrapper.dart';
 import 'presentation/settings/settings_cubit.dart';
@@ -304,7 +305,7 @@ class SuefereyPartnerApp extends StatelessWidget {
                   locale: context.read<SettingsCubit>().state.locale, // Use the locale from the SettingsCubit
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
-                  home: AuthWrapper(),
+                  home: AuthChecker(),
                 );
               },
             ),

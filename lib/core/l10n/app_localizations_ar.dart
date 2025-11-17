@@ -172,4 +172,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get logInPrompt => 'تسجيل الدخول';
+
+  @override
+  String get addProduct => 'إضافة منتج';
+
+  @override
+  String get productNameHint => 'اسم المنتج';
+
+  @override
+  String get productPriceHint => 'السعر';
+
+  @override
+  String get productDescriptionHint => 'الوصف (اختياري)';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String get nameCannotBeEmpty => 'لا يمكن أن يكون الاسم فارغًا';
+
+  @override
+  String get priceInvalid => 'الرجاء إدخال سعر صحيح';
+
+  @override
+  String get editProduct => 'تعديل المنتج';
+
+  @override
+  String get update => 'تحديث';
 }

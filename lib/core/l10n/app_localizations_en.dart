@@ -171,4 +171,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logInPrompt => 'Login';
+
+  @override
+  String get addProduct => 'Add Product';
+
+  @override
+  String get productNameHint => 'Product Name';
+
+  @override
+  String get productPriceHint => 'Price';
+
+  @override
+  String get productDescriptionHint => 'Description (optional)';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get nameCannotBeEmpty => 'Name cannot be empty';
+
+  @override
+  String get priceInvalid => 'Please enter a valid price';
+
+  @override
+  String get editProduct => 'Edit Product';
+
+  @override
+  String get update => 'Update';
 }

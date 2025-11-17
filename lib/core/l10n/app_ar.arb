@@ -61,6 +61,16 @@
     "googleSignin" : "تسجيل الدخول باستخدام جوجل",
     "facebookSignin" : "تسجيل الدخول باستخدام فيسبوك",
     "twitterSignin" : "تسجيل الدخول باستخدام تويتر",
-    "logInPrompt" : "تسجيل الدخول"
+    "logInPrompt" : "تسجيل الدخول",
+    "addProduct": "إضافة منتج",
+    "productNameHint": "اسم المنتج",
+    "productPriceHint": "السعر",
+    "productDescriptionHint": "الوصف (اختياري)",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "nameCannotBeEmpty": "لا يمكن أن يكون الاسم فارغًا",
+    "priceInvalid": "الرجاء إدخال سعر صحيح",
+        "editProduct": "تعديل المنتج",
+    "update": "تحديث"
 
 }

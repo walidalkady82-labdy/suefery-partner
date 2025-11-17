@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../home/home_screen.dart';
 import 'auth_cubit.dart';
 import '../../data/enums/auth_status.dart';
 import 'auth_wrapper.dart';
@@ -21,7 +22,7 @@ class AuthChecker extends StatelessWidget {
         }
         // 2. User is Logged In
         if (state.authState == AuthStatus.authenticated && state.user != null) {
-          //return const HomeScreen();
+          return const HomeScreen();
         }
         // 3. User is Logged Out
           return const AuthWrapper(); // Navigates between Login and Sign Up

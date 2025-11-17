@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:suefery_partner/data/services/inventory_service.dart';
 import 'package:suefery_partner/data/models/order_model.dart';
 import 'package:suefery_partner/data/services/auth_service.dart';
 import 'package:suefery_partner/data/services/order_service.dart';
@@ -51,6 +52,7 @@ class HomeCubit extends Cubit<HomeState> {
   // --- Dependencies ---
   final OrderService _orderService = sl<OrderService>();
   final AuthService _authService = sl<AuthService>();
+  final InventoryService _inventoryService = sl<InventoryService>();
   // final PaymentService _paymentService; // Uncomment when ready
 
   StreamSubscription? _chatSubscription;
@@ -142,18 +144,36 @@ class HomeCubit extends Cubit<HomeState> {
     if (currentUserId.isEmpty) return;
     emit(state.copyWith(isLoading: true, error: ''));
     try {
-      // Assuming an InventoryService exists and is registered in sl
-      // final products = await _inventoryService.fetchInventory(currentUserId);
-      // emit(state.copyWith(products: products, isLoading: false));
+      final products = await _inventoryService.fetchInventory(currentUserId);
+      emit(state.copyWith(products: products, isLoading: false));
     } catch (e) {
       emit(state.copyWith(error: e.toString(), isLoading: false));
     }
   }
 
   Future<void> toggleAvailability(String productId, bool isAvailable) async {
-    // Assuming an InventoryService exists
-    // await _inventoryService.updateProductAvailability(productId, isAvailable);
+    await _inventoryService.updateProductAvailability(productId, isAvailable);
     fetchInventory(); // Refetch to get the updated list
+  }
+
+  Future<void> addProduct(ProductModel product) async {
+    emit(state.copyWith(isLoading: true));
+    try {
+      await _inventoryService.addProduct(product);
+      await fetchInventory(); // Refresh the list
+    } catch (e) {
+      emit(state.copyWith(error: e.toString(), isLoading: false));
+    }
+  }
+
+  Future<void> updateProduct(ProductModel product) async {
+    emit(state.copyWith(isLoading: true));
+    try {
+      await _inventoryService.updateProduct(product);
+      await fetchInventory(); // Refresh the list
+    } catch (e) {
+      emit(state.copyWith(error: e.toString(), isLoading: false));
+    }
   }
 
   void changeView(int index) {

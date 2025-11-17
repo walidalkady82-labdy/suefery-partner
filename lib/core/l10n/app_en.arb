@@ -67,6 +67,15 @@
     "googleSignin" : "Sign in with Google",
     "facebookSignin" : "Sign in with Facebook",
     "twitterSignin" : "Sign in with Twitter",
-    "logInPrompt" : "Login"
-
+    "logInPrompt" : "Login",
+    "addProduct": "Add Product",
+    "productNameHint": "Product Name",
+    "productPriceHint": "Price",
+    "productDescriptionHint": "Description (optional)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "nameCannotBeEmpty": "Name cannot be empty",
+    "priceInvalid": "Please enter a valid price",
+    "editProduct": "Edit Product",
+    "update": "Update"
 }

@@ -4,10 +4,12 @@ import 'package:suefery_partner/core/l10n/l10n_extension.dart';
 import 'package:suefery_partner/data/enums/order_status.dart';
 import 'package:suefery_partner/presentation/home/home_cubit.dart';
 import '../../data/models/order_model.dart';
+import 'edit_product_modal.dart';
 import '../auth/auth_cubit.dart';
+import 'add_product_modal.dart';
 
-class PartnerHomeScreen extends StatelessWidget {
-  const PartnerHomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -150,46 +152,73 @@ class InventoryManagementTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.l10n;
-    return BlocBuilder<HomeCubit, HomeState>(
-      builder: (context, state) {
-        if (state.isLoading && state.products.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => BlocProvider.value(
+              value: context.read<HomeCubit>(),
+              child: const AddProductModal(),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          if (state.isLoading && state.products.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        if (state.error.isNotEmpty) {
-          return Center(child: Text(state.error));
-        }
+          if (state.error.isNotEmpty) {
+            return Center(child: Text(state.error));
+          }
 
-        if (state.products.isEmpty && !state.isLoading) {
-          return Center(child: Text(strings.loadingInventory));
-        }
+          if (state.products.isEmpty && !state.isLoading) {
+            return Center(child: Text(strings.welcome)); // Or a more specific "No products yet" message
+          }
 
-        return RefreshIndicator(
-          onRefresh: () => context.read<HomeCubit>().fetchInventory(),
-          child: ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: state.products.length,
-            itemBuilder: (context, index) {
-              final product = state.products[index];
-              return Card(
-                child: SwitchListTile(
-                  title: Text(product.name),
-                  subtitle: Text('${product.price.toStringAsFixed(2)} EGP'),
-                  value: product.isAvailable,
-                  onChanged: (newValue) {
-                    context.read<HomeCubit>().toggleAvailability(product.productId, newValue);
-                  },
-                  activeColor: Colors.green,
-                  inactiveThumbColor: Colors.red,
-                  secondary: product.isAvailable
-                      ? Text(strings.inStock, style: const TextStyle(color: Colors.green))
-                      : Text(strings.outOfStock, style: const TextStyle(color: Colors.red)),
-                ),
-              );
-            },
-          ),
-        );
-      },
+          return RefreshIndicator(
+            onRefresh: () => context.read<HomeCubit>().fetchInventory(),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: state.products.length,
+              itemBuilder: (context, index) {
+                final product = state.products[index];
+                return Card(
+                  child: ListTile(
+                    title: Text(product.description), // Note: Your model uses 'description' for the name
+                    subtitle: Text('${product.price.toStringAsFixed(2)} EGP'),
+                    leading: Switch(
+                      value: product.isAvailable,
+                      onChanged: (newValue) {
+                        context.read<HomeCubit>().toggleAvailability(product.productId, newValue);
+                      },
+                      activeColor: Colors.green,
+                      inactiveThumbColor: Colors.red,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit_outlined),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (_) => BlocProvider.value(
+                            value: context.read<HomeCubit>(),
+                            child: EditProductModal(product: product),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }

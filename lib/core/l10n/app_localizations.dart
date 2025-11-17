@@ -409,6 +409,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Login'**
   String get logInPrompt;
+
+  /// No description provided for @addProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Product'**
+  String get addProduct;
+
+  /// No description provided for @productNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Product Name'**
+  String get productNameHint;
+
+  /// No description provided for @productPriceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get productPriceHint;
+
+  /// No description provided for @productDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get productDescriptionHint;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @nameCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Name cannot be empty'**
+  String get nameCannotBeEmpty;
+
+  /// No description provided for @priceInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid price'**
+  String get priceInvalid;
+
+  /// No description provided for @editProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Product'**
+  String get editProduct;
+
+  /// No description provided for @update.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
 }
 
 class _AppLocalizationsDelegate
