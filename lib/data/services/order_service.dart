@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:suefery_partner/data/enums/order_status.dart';
 import 'package:suefery_partner/data/models/order_model.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 
+import '../models/mock_orders.dart';
 import '../repositories/i_repo_firestore.dart';
 import 'remote_config_service.dart';
 
@@ -46,6 +48,9 @@ class OrderService {
   /// [partnerId] The ID of the partner/store to fetch orders for.
   /// Returns a stream of a list of [OrderModel].
   Stream<List<OrderModel>> getOrdersStream(String partnerId) {
+    if(kDebugMode){
+      return Stream.value(MockOrders.allOrders);
+    }
     _log.i('Streaming orders for partner: $partnerId');
     try {
       return _firestoreRepo

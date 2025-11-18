@@ -155,6 +155,7 @@ class InventoryManagementTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.l10n;
+    final homeCubit = context.read<HomeCubit>();
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -186,7 +187,7 @@ class InventoryManagementTab extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextField(
-                  onChanged: (query) => context.read<HomeCubit>().searchInventory(query),
+                  onChanged: (query) => homeCubit.searchInventory(query),
                   decoration: InputDecoration(
                     labelText: strings.search,
                     prefixIcon: const Icon(Icons.search),
@@ -201,7 +202,7 @@ class InventoryManagementTab extends StatelessWidget {
                   child: ScrollConfiguration(
                     behavior: AppScrollBehavior(),
                     child: RefreshIndicator(
-                      onRefresh: () => context.read<HomeCubit>().fetchInventory(),
+                      onRefresh: () => homeCubit.fetchInventory(),
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         itemCount: filteredProducts.length,
@@ -209,12 +210,12 @@ class InventoryManagementTab extends StatelessWidget {
                           final product = filteredProducts[index];
                           return Card(
                             child: ListTile(
-                              title: Text(product.description),
+                              title: Text("${product.description} ${product.brand}"),
                               subtitle: Text('${product.price.toStringAsFixed(2)} EGP'),
                               leading: Switch(
                                 value: product.isAvailable,
                                 onChanged: (newValue) {
-                                  context.read<HomeCubit>().toggleAvailability(product.productId, newValue);
+                                  homeCubit.toggleAvailability(product.productId, newValue);
                                 },
                                 activeColor: Colors.green,
                                 inactiveThumbColor: Colors.red,
@@ -226,7 +227,7 @@ class InventoryManagementTab extends StatelessWidget {
                                     context: context,
                                     isScrollControlled: true,
                                     builder: (_) => BlocProvider.value(
-                                      value: context.read<HomeCubit>(),
+                                      value: homeCubit,
                                       child: EditProductModal(product: product),
                                     ));
                                 },

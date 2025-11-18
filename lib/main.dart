@@ -293,6 +293,7 @@ class SuefereyPartnerApp extends StatelessWidget {
                   darkTheme: ThemeData(
                     brightness: Brightness.dark,
                     primaryColor: const Color(0xFF00796B),
+                    fontFamily: 'Cairo',
                     colorScheme: ColorScheme.fromSwatch(
                       primarySwatch: Colors.teal,
                       brightness: Brightness.dark,
@@ -301,6 +302,7 @@ class SuefereyPartnerApp extends StatelessWidget {
                     ),
                     useMaterial3: true,
                   ),
+                  
                   themeMode: context.read<SettingsCubit>().state.themeMode, // Use the themeMode from the SettingsCubit
                   locale: context.read<SettingsCubit>().state.locale, // Use the locale from the SettingsCubit
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
