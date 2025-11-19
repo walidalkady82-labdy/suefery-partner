@@ -10,11 +10,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:suefery_partner/core/l10n/app_localizations.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 import 'package:suefery_partner/locator.dart';
+import 'package:suefery_partner/presentation/auth/auth_checker.dart';
 import 'package:suefery_partner/presentation/auth/auth_cubit.dart';
-import 'package:suefery_partner/presentation/home/order_cubit.dart';
 
 import 'firebase_options.dart';
-import 'presentation/auth/auth_checker.dart';
 import 'presentation/settings/settings_cubit.dart';
 
 
@@ -258,14 +257,22 @@ class SuefereyPartnerApp extends StatelessWidget {
   const SuefereyPartnerApp({super.key});
 
   @override
-  Widget build(BuildContext context) {    
-    return BlocProvider(
-            create: (context) => OrderCubit(),
-            child: BlocBuilder<OrderCubit, OrderState>(
+  Widget build(BuildContext context) {  
+    return MultiBlocProvider(
+            providers: [
+              BlocProvider<SettingsCubit>(
+                create: (context) => SettingsCubit(),
+              ),
+              BlocProvider<AuthCubit>(
+                create: (context) => AuthCubit(),
+              ),
+            ],
+            child: BlocBuilder<SettingsCubit, SettingsState>(
               builder: (context, homeState) {
+                final settings = context.read<SettingsCubit>();
                 return MaterialApp(
-                  onGenerateTitle: (ctx) => AppLocalizations.of(ctx)!.appTitle,          
-                  theme: context.read<SettingsCubit>().state.appTheme.themeData,
+                  onGenerateTitle: (ctx) => AppLocalizations.of(ctx)?.appTitle ?? 'Suefery Partner',
+                  theme: settings.state.appTheme.themeData,
                   darkTheme: ThemeData(
                     brightness: Brightness.dark,
                     primaryColor: const Color(0xFF00796B),
@@ -278,14 +285,11 @@ class SuefereyPartnerApp extends StatelessWidget {
                     ),
                     useMaterial3: true,
                   ),
-                  
-                  themeMode: context.read<SettingsCubit>().state.themeMode, // Use the themeMode from the SettingsCubit
-                  locale: context.read<SettingsCubit>().state.locale, // Use the locale from the SettingsCubit
+                  themeMode: settings.state.themeMode, // Use the themeMode from the SettingsCubit
+                  locale: settings.state.locale, // Use the locale from the SettingsCubit
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
-                  home:  BlocProvider(
-                            create: (ctx) => AuthCubit(),
-                          ),
+                  home:  AuthChecker(),
                 );
               },
             ),

@@ -21,30 +21,36 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     
     // 1. Watch the HomeCubit for state changes (e.g., new orders loading)
-    return BlocConsumer<OrderCubit, OrderState>(
-      listener: (context, state) {
-        if (state.error.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => OrderCubit()),
+        BlocProvider(create: (_) => InventoryCubit()),
+      ],
+      child: BlocConsumer<OrderCubit, OrderState>(
+        listener: (context, state) {
+          if (state.error.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(context.l10n.appTitle), // "SUEFERY Partner"
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications),
+                  onPressed: () {
+                    // Navigate to notifications or show list
+                  },
+                ),
+              ],
+            ),
+            body: _buildBody(context,state),
           );
-        }
-      },
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(context.l10n.appTitle), // "SUEFERY Partner"
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications),
-                onPressed: () {
-                  // Navigate to notifications or show list
-                },
-              ),
-            ],
-          ),
-          body: _buildBody(context,state),
-        );
-      },
+        },
+      ),
     );
   }
 
@@ -419,7 +425,6 @@ class _QuoteOrderSheetState extends State<QuoteOrderSheet> {
   @override
   Widget build(BuildContext context) {
     final strings = context.l10n;
-
     return BlocBuilder<QuoteCubit, QuoteState>(
       builder: (context, quoteState) {
         return DraggableScrollableSheet(

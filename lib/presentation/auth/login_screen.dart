@@ -28,13 +28,8 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 20),
               BlocBuilder<AuthCubit, AuthState>(
                 builder: (context, state) {
-                  // We only build the form if the user is unauthenticated.
                   if (state.authState == AuthStatus.unauthenticated) {
-                    // Show a loader or an empty container if state is not Unauthenticated
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  // Extract the form state
-                  return Column(
+                    return Column(
                     children: [
                       // Sign in with Google (W1 Low-Friction for Customers)
                       SizedBox(
@@ -114,6 +109,9 @@ class LoginScreen extends StatelessWidget {
 
                     ],
                   );
+                  }
+                  // Show a loader while checking auth status or authenticating
+                  return const Center(child: CircularProgressIndicator());
                 }
               )
 

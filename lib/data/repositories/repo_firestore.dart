@@ -172,12 +172,18 @@ class RepoFirestore implements IRepoFirestore {
   Future<void> addDocument(String collectionPath, Map<String, dynamic> data) async {
     await _firestore.collection(collectionPath).add(data);
   }
+  
   @override
   Future<void> updateDocument(
       String collectionPath, String documentId, Map<String, dynamic> data) async {
     await _firestore.collection(collectionPath).doc(documentId).update(data);
   }
-  
+
+  @override
+  Future<void> setDocument(
+      String collectionPath, String documentId, Map<String, dynamic> data , {bool merge = false}) async {
+    await _firestore.collection(collectionPath).doc(documentId).set(data);
+  }
   @override
   Future<void> remove(String path, String id) async {
     try {

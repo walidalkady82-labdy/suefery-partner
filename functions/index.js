@@ -7,21 +7,20 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
-const functions = require("firebase-functions");
+const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
 
 // TRIGGER: When a NEW Order is created in Firestore
-exports.onNewOrder = functions.firestore
-  .document('orders/{orderId}')
-  .onCreate(async (snap, context) => {
+exports.onNewOrder = onDocumentCreated("orders/{orderId}", async (event) => {
+    const snap = event.data;
+    if (!snap) {
+        console.log("No data associated with the event");
+        return;
+    }
     const orderData = snap.data();
     const storeId = orderData.storeId;
-
     if (!storeId) return;
 
     // 1. Find the Partner(s) who own this store
@@ -29,7 +28,7 @@ exports.onNewOrder = functions.firestore
     const partnersSnapshot = await admin.firestore()
       .collection('users')
       .where('storeId', '==', storeId)
-      .where('userType', '==', 'partner')
+      .where('role', '==', 'partner')
       .get();
 
     const tokens = [];
@@ -46,29 +45,33 @@ exports.onNewOrder = functions.firestore
     const payload = {
       notification: {
         title: 'New Order Received! 🔔',
-        body: `Order #${context.params.orderId.substring(0, 4)} is waiting for a quote.`,
+        body: `Order #${event.params.id.substring(0, 4)} is waiting for a quote.`,
       },
       data: {
-        orderId: context.params.orderId,
+        orderId: event.params.id,
         type: 'new_order'
       }
     };
 
     // 3. Send to all partners of that store
-    return admin.messaging().sendToDevice(tokens, payload);
+    return admin.messaging().send(tokens, payload);
   });
 
 // TRIGGER: When Order Status Changes (e.g. Partner Accepted)
-exports.onOrderStatusChange = functions.firestore
-  .document('orders/{orderId}')
-  .onUpdate(async (change, context) => {
+exports.onOrderStatusChange = onDocumentUpdated("orders/{orderId}", async (event) => {
+    const change = event.data;
+    if (!change) {
+        console.log("No data associated with the event");
+        return;
+    }
     const newData = change.after.data();
     const oldData = change.before.data();
 
     // Only notify if status changed
+    // eslint-disable-next-line no-useless-return
     if (newData.status === oldData.status) return;
 
-    const customerId = newData.userId;
+    const customerId = newData.id;
     
     // 1. Get Customer Token
     const userDoc = await admin.firestore().collection('users').doc(customerId).get();
@@ -83,10 +86,10 @@ exports.onOrderStatusChange = functions.firestore
         body: `Your order is now: ${newData.status}`,
       },
       data: {
-        orderId: context.params.orderId,
+        orderId: event.params.id,
         type: 'order_update'
       }
     };
 
-    return admin.messaging().sendToDevice(fcmToken, payload);
+    return admin.messaging().send(fcmToken, payload);
   });

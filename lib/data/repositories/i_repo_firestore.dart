@@ -60,15 +60,18 @@ abstract class IRepoFirestore {
     int? limit,
   });
   /// Updates a specific document in a collection.
-  Future<void> updateDocument(String collectionPath, String documentId, Map<String, dynamic> data);
-
-  Future<void> remove(String path, String id);
-
+  
   Stream<DocumentSnapshot<Map<String, dynamic>>> getDocumentStream(String collectionPath, String docId);
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getDocumentSnapShot(String collectionPath, String docId);
   
   Future<void> addDocument(String collectionPath, Map<String, dynamic> data) ;
+
+  Future<void> updateDocument(String collectionPath, String documentId, Map<String, dynamic> data);
+
+  Future<void> setDocument(String collectionPath, String documentId, Map<String, dynamic> data, {bool merge = false});
+
+  Future<void> remove(String path, String id);
 
 }
 

@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:suefery_partner/data/services/auth_service.dart';
+import 'package:suefery_partner/locator.dart';
 
 import '../../data/models/product_model.dart';
 import '../../data/services/inventory_service.dart';
@@ -34,12 +35,12 @@ class InventoryState {
 }
 
 class InventoryCubit extends Cubit<InventoryState> {
-  final AuthService _authService;
-  final InventoryService _inventoryService;
+  final AuthService _authService = sl<AuthService>();
+  final InventoryService _inventoryService = sl<InventoryService>();
   StreamSubscription? _productsSubscription;
   String? _currentStoreId;
 
-  InventoryCubit(this._authService ,this._inventoryService) : super(InventoryState());
+  InventoryCubit() : super(InventoryState());
 
   void fetchInventory(String storeId) {
     _currentStoreId = storeId;

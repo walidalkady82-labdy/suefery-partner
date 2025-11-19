@@ -45,6 +45,7 @@ Future<void> initLocator(FirebaseApp firebaseApp) async {
     RepoFirestore.create(useEmulator: useEmulatorEnv)
   );
 
+    
   // --- SERVICES (The "Managers") ---
   
   // Remote Config Service (Async) ---
@@ -53,7 +54,7 @@ Future<void> initLocator(FirebaseApp firebaseApp) async {
   // Auth Service
   sl.registerLazySingleton<AuthService>(() => AuthService(
         sl<IRepoAuth>(),
-        sl<RepoFirestore>(),
+        sl<IRepoFirestore>(),
         sl<PrefService>(),
       ));
 

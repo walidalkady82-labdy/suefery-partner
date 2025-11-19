@@ -78,13 +78,17 @@ class AuthService{
   /// NEW: Pings Firestore to update 'last_seen' and 'status'
   Future<void> _updateKeepAlive(String partnerId) async {
     try {
-      await _firestoreRepo.updateDocument(
+      // Use an "upsert" operation (update or create) to prevent "not-found" errors.
+      // This sets the document with the provided data, merging it with existing
+      // data if the document already exists. If it doesn't exist, it's created.
+      await _firestoreRepo.setDocument(
         'partners',
         partnerId,
         {
           'status': PartnerStatus.active.name,
           'last_seen': DateTime.now().toIso8601String(),
         },
+        merge: true, // This is the key to making it an upsert.
       );
       _log.i('Keep-Alive Ping: Partner $partnerId is online.');
     } catch (e) {
