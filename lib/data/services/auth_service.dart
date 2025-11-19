@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/errors/authentication_exception.dart';
 import '../enums/auth_status.dart';
 import '../enums/partner_status.dart';
+import '../enums/user_role.dart';
 import '../models/user_model.dart';
 import '../repositories/i_repo_auth.dart';
 import '../repositories/i_repo_firestore.dart';
@@ -21,6 +22,8 @@ class AuthService{
   final IRepoFirestore _firestoreRepo;
   Timer? _keepAliveTimer; // NEW: Timer for S3 Keep-Alive
   final _log = LoggerRepo('AuthService'); // Assuming LoggerRepo exists
+  final String _collectionPath = 'users';
+  UserModel? _currentAppUser;
 
   /// {@macro authentication_service}
   ///
@@ -34,25 +37,25 @@ class AuthService{
   }
   /// Gets the current [UserModel] by mapping the repository's [User].
   /// Returns `null` if no user is signed in.
-  UserModel? get currentAppUser {
-    final firebaseUser = _authRepository.currentUser;
-    if (firebaseUser == null) return null;
-    return UserModel.fromFirebaseUser(firebaseUser);
-  }
+  UserModel? get currentAppUser => _currentAppUser;
 
   /// Exposes a stream of [AppUser?]
   ///
   /// This maps the repository's Firebase [User?] stream to your
   /// app's internal [AppUser?] model.
   Stream<AuthStatus> onAuthStatusChanged() {
-    return _authRepository.authStateChanges.map((User? user) {
+    return _authRepository.authStateChanges.asyncMap((User? user) async {
       if (user != null) {
+        // User is authenticated, fetch their full profile from Firestore.
+        _currentAppUser = await getUser(user.uid);
         // --- S3 (Keep-Alive) LOGIC START ---
         // User is logged in, start the keep-alive timer
         startKeepAlive(user.uid);
         // --- S3 LOGIC END ---
         return AuthStatus.authenticated;
       } else {
+        // User is logged out, clear the cached user model.
+        _currentAppUser = null;
         // --- S3 (Keep-Alive) LOGIC START ---
         // User is logged out, stop the timer
         stopKeepAlive();
@@ -81,14 +84,13 @@ class AuthService{
       // Use an "upsert" operation (update or create) to prevent "not-found" errors.
       // This sets the document with the provided data, merging it with existing
       // data if the document already exists. If it doesn't exist, it's created.
-      await _firestoreRepo.setDocument(
-        'partners',
+      await _firestoreRepo.updateDocument(
+        _collectionPath,
         partnerId,
         {
           'status': PartnerStatus.active.name,
           'last_seen': DateTime.now().toIso8601String(),
         },
-        merge: true, // This is the key to making it an upsert.
       );
       _log.i('Keep-Alive Ping: Partner $partnerId is online.');
     } catch (e) {
@@ -123,6 +125,9 @@ class AuthService{
   Future<UserModel?> signUpWithEmailAndPassword({
     required String email,
     required String password,
+    required String firstName,
+    required String lastName,
+    required String phone,
   }) async {
     try {
       final userCredential = await _authRepository.signUp(
@@ -133,6 +138,21 @@ class AuthService{
 
       if (user != null) {
         await _prefRepo.setIsFirstLogin(true);
+        final partnerMap = {
+          'uid': user.uid,
+          'email': email,
+          'firstName': firstName,
+          'lastName': lastName,
+          'phone': phone,
+          'storeId': user.uid,
+          'status': PartnerStatus.inactive.name,
+          'role': UserRole.partner.name, 
+          'createdAt': DateTime.now().toIso8601String(),
+        };
+        await _firestoreRepo.setDocument(_collectionPath, user.uid, partnerMap);
+        // Cache the newly created user model.
+        _currentAppUser = UserModel.fromMap(partnerMap);
+
         await _handleSuccessfulLogin(user);
         return UserModel.fromFirebaseUser(user);
       }
@@ -289,10 +309,15 @@ class AuthService{
    /// Deletes the current user's account and clears their local session.
   Future<void> deleteUser() async {
     try {
+      final userId = _authRepository.currentUser?.uid;
+      if (userId == null) {
+        throw Exception('No user ID available for deletion.');
+      }
       _log.i('Attempting to delete user account...');
       await _authRepository.deleteUser();
       _log.i('User account deleted successfully from provider.');
       // After successful deletion, clear all local data
+      _firestoreRepo.remove(_collectionPath, userId);
       await _clearUserSession();
     } on FirebaseAuthException catch (e) {
       _log.e('Error deleting user: ${e.code} - ${e.message}');
@@ -340,6 +365,7 @@ class AuthService{
       rethrow;
     }
   }
+  
   Future<void> reloadUser() async {
     try {
       await _authRepository.reloadUser();
@@ -348,4 +374,68 @@ class AuthService{
       rethrow;
     }
   }
+
+  //firestore functions
+    /// Gets a stream of a single user, converting it to an [UserModel] model.
+  Stream<UserModel?> getUserStream(String userId) {
+    return _firestoreRepo
+        .getDocumentStream(_collectionPath, userId)
+        .map((snapshot) {
+      if (!snapshot.exists || snapshot.data() == null) {
+        return null;
+      }
+      // Business Logic: Handles data conversion
+      return UserModel.fromMap(snapshot.data()!);
+    });
+  }
+
+  Stream<PartnerStatus> getPartnerStatusStream(String userId) {
+    return _firestoreRepo
+        .getDocumentStream(_collectionPath, userId) 
+        .map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        final data = snapshot.data()!;
+        // Returns the status from Firestore, defaulting to offline if missing
+        return PartnerStatusExtension.fromString(data['status'] ?? 'inactive');
+      }
+      return PartnerStatus.inactive;
+    });
+  }
+
+  /// Fetches a single user by their ID.
+  Future<UserModel?> getUser(String userId) async {
+    final snapshot =
+        await _firestoreRepo.getDocumentSnapShot(_collectionPath, userId);
+    if (!snapshot.exists || snapshot.data() == null) {
+      return null;
+    }
+    return UserModel.fromMap(snapshot.data()!);
+  }
+
+  /// Creates a new user in the database from an [UserModel] object.
+  Future<void> createUser(UserModel user) {
+    // Business Logic: Ensures a new user is created with their ID
+    // and handles data conversion.
+    return _firestoreRepo.updateDocument(
+      _collectionPath,
+      user.id, // Use update/set to enforce the ID
+      user.toMap(),
+    );
+  }
+
+  /// Updates specific fields for a user.
+  Future<void> updateUser(String userId, {String? name, String? email , String? fcmToken}) {
+    final dataToUpdate = <String, dynamic>{};
+    if (name != null) {
+      dataToUpdate['name'] = name;
+    }
+    if (email != null) {
+      dataToUpdate['email'] = email;
+    }
+     if (fcmToken != null) {
+      dataToUpdate['fcmToken'] = fcmToken;
+    }
+    return _firestoreRepo.updateDocument(_collectionPath, userId, dataToUpdate);
+  }
+
 }

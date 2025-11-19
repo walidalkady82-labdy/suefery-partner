@@ -285,4 +285,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get delete => 'Delete';
+
+  @override
+  String get firstNameLabel => 'First Name';
+
+  @override
+  String get lastNameLabel => 'Last Name';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get confirmPasswordLabel => 'Confirm Password';
+
+  @override
+  String get firstNameRequired => 'First name is required';
+
+  @override
+  String get phoneLabel => 'Phone';
+
+  @override
+  String get phoneRequired => 'phone number name is required';
+
+  @override
+  String get lastNameRequired => 'Last name is required';
+
+  @override
+  String get addressLabel => 'Address';
+
+  @override
+  String get addressRequired => 'Address is required';
+
+  @override
+  String get cityLabel => 'City';
+
+  @override
+  String get cityRequired => 'City is required';
+
+  @override
+  String get stateLabel => 'State';
+
+  @override
+  String get stateRequired => 'State is required';
+
+  @override
+  String get countryLabel => 'Country';
+
+  @override
+  String get countryRequired => 'Country is required';
+
+  @override
+  String get zipCodeLabel => 'Zip Code';
+
+  @override
+  String get zipCodeRequired => 'Zip Code is required';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountConfirmation => 'Confirm Delete Account';
+
+  @override
+  String get displayName => 'Display Name';
+
+  @override
+  String get deleteAccountHint => 'Please type DELETE to confirm.';
 }

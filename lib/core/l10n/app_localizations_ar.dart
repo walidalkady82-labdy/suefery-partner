@@ -286,4 +286,73 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get delete => 'حذف';
+
+  @override
+  String get firstNameLabel => 'الاسم الأول';
+
+  @override
+  String get lastNameLabel => 'الاسم الأخير';
+
+  @override
+  String get emailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get passwordLabel => 'كلمة المرور';
+
+  @override
+  String get confirmPasswordLabel => 'تأكيد كلمة المرور';
+
+  @override
+  String get firstNameRequired => 'الاسم الأول مطلوب';
+
+  @override
+  String get phoneLabel => 'رقم الهاتف';
+
+  @override
+  String get phoneRequired => 'رقم الهاتف مطلوب';
+
+  @override
+  String get lastNameRequired => 'الاسم الأخير مطلوب';
+
+  @override
+  String get addressLabel => 'العنوان';
+
+  @override
+  String get addressRequired => 'العنوان مطلوب';
+
+  @override
+  String get cityLabel => 'المدينة';
+
+  @override
+  String get cityRequired => 'المدينة مطلوبةة';
+
+  @override
+  String get stateLabel => 'المنطقة';
+
+  @override
+  String get stateRequired => 'المنطقة مطلوبةة';
+
+  @override
+  String get countryLabel => 'البلد';
+
+  @override
+  String get countryRequired => 'البلد مطلوب';
+
+  @override
+  String get zipCodeLabel => 'الرمز البريدي';
+
+  @override
+  String get zipCodeRequired => 'الرمز البريدي مطلوبة';
+
+  @override
+  String get deleteAccount => 'حذف الحساب';
+
+  @override
+  String get deleteAccountConfirmation => 'تأكيد حذف الحساب';
+
+  @override
+  String get displayName => 'اسم المستخدم';
+
+  @override
+  String get deleteAccountHint => 'الرجاء كتابة DELETE للتأكيد.';
 }

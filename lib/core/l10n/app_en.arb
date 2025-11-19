@@ -382,5 +382,94 @@
    
   "delete" : "Delete",
   "@delete": {
-  "description": "Delete button message"}
+  "description": "Delete button message"},
+     
+  "firstNameLabel" : "First Name",
+  "@firstNameLabel": {
+  "description": "First name TextFormField"},
+
+  "lastNameLabel" : "Last Name",
+  "@lastNameLabel": {
+  "description": "Last name TextFormField"},
+
+  "emailLabel" : "Email",
+  "@emailLabel": {
+  "description": "Email TextFormField"},
+
+  "passwordLabel" : "Password",
+  "@passwordLabel": {
+  "description": "Password TextFormField"},
+
+  "confirmPasswordLabel" : "Confirm Password",
+  "@confirmPasswordLabel": {
+  "description": "Confirm Password TextFormField"},
+
+  "firstNameRequired" : "First name is required",
+  "@firstNameRequired": {
+  "description": "Missing first name error message"},
+     
+  "phoneLabel" : "Phone",
+  "@phoneLabel": {
+  "description": "Phone TextFormField"},  
+  
+  "phoneRequired" : "phone number name is required",
+  "@phoneRequired": {
+  "description": "Missing phone number error message"},
+
+  "lastNameRequired" : "Last name is required",
+  "@lastNameRequired": {
+  "description": "Missingrror message"},
+
+  "addressLabel" : "Address",
+  "@addressLabel": {
+  "description": "Address TextFormField"},
+
+  "addressRequired" : "Address is required",
+  "@addressRequired": {
+  "description": "Missing address error message"},
+
+  "cityLabel" : "City",
+  "@cityLabel": {
+  "description": "City TextFormField"},
+
+  "cityRequired" : "City is required",
+  "@cityRequired": {
+  "description": "Missing city error message"},
+
+  "stateLabel" : "State",
+  "@stateLabel": {
+  "description": "State TextFormField"},
+  
+  "stateRequired" : "State is required",
+  "@stateRequired": {
+  "description": "Missing state error message"},
+
+  "countryLabel" : "Country",
+  "@countryLabel": {
+  "description": "Country TextFormField"},
+
+  "countryRequired" : "Country is required",
+  "@countryRequired": {
+  "description": "Missing country error message"},
+
+  "zipCodeLabel" : "Zip Code",
+  "@zipCodeLabel": {
+  "description": "Zip Code TextFormField"},
+
+  "zipCodeRequired" : "Zip Code is required",
+  "@zipCodeRequired": {
+  "description": "Missing zip code error message"},
+
+  "deleteAccount" : "Delete Account",
+  "@deleteAccount": { "description": "Delete Account label"},
+
+  "deleteAccountConfirmation" : "Confirm Delete Account",
+  "@deleteAccountConfirmation": { "description": "Delete Account label confirmation"},
+
+  "displayName" : "Display Name",
+  "@displayName": { "description": "Display name label"},
+
+  "deleteAccountHint" : "Please type DELETE to confirm.",
+  "@deleteAccountHint": { "description": "Display delete account hint"}
+
 }

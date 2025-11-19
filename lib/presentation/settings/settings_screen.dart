@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:suefery_partner/core/l10n/app_localizations.dart';
+import 'package:suefery_partner/presentation/auth/auth_cubit.dart';
 import 'package:suefery_partner/core/l10n/l10n_extension.dart';
 import 'package:suefery_partner/presentation/profile/profile_screen.dart';
 import 'package:suefery_partner/presentation/settings/settings_cubit.dart';
@@ -11,49 +12,61 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.l10n;
-    return BlocBuilder<SettingsCubit, SettingsState>(builder: (context, state) {
-      final settingsCubit = context.read<SettingsCubit>();
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(strings.settingsTitle),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(strings.settingsTitle),
+      ),
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: context.read<SettingsCubit>()),
+          BlocProvider.value(value: context.read<AuthCubit>()),
+        ],
+        child: BlocBuilder<SettingsCubit, SettingsState>(
+          builder: (context, state) {
+            final settingsCubit = context.read<SettingsCubit>();
+            return ListView(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.account_circle_outlined),
+                  title: Text(strings.profileTitle),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                    );
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.language),
+                  title: Text(strings.changeLanguage),
+                  subtitle: Text(strings.currentLanguage(state.locale.languageCode)),
+                  onTap: () => _showLanguagePickerDialog(context, settingsCubit),
+                ),
+                SwitchListTile(
+                  title: Text(strings.darkMode),
+                  value: state.themeMode == ThemeMode.dark,
+                  onChanged: (isDark) => settingsCubit.toggleTheme(),
+                  secondary: const Icon(Icons.dark_mode_outlined),
+                ),
+                const Divider(),
+                ListTile(
+                  leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+                  title: Text(
+                    strings.logout,
+                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    context.read<AuthCubit>().signOut();
+                  },
+                ),
+              ],
+            );
+          },
         ),
-        body: ListView(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.account_circle_outlined),
-              title: Text(strings.profileTitle), // Add 'profileTitle' to localizations
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const ProfileScreen()));
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.language),
-              title: Text(strings.changeLanguage),
-              subtitle: Text(strings.currentLanguage(state.locale.languageCode)),
-              onTap: () => _showLanguagePickerDialog(context, settingsCubit),
-            ),
-            SwitchListTile(
-              title: Text(strings.darkMode),
-              value: state.themeMode == ThemeMode.dark,
-              onChanged: (isDark) => settingsCubit.toggleTheme(),
-              secondary: const Icon(Icons.dark_mode_outlined),
-            ),
-            // // Assuming AppTheme is an enum you have defined elsewhere
-            // // You can map over its values to create the radio buttons
-            // ...AppTheme.values.map((theme) {
-            //   return RadioListTile<AppTheme>(
-            //     value: theme,
-            //     groupValue: state.appTheme,
-            //     onChanged: (newTheme) => settingsCubit.changeTheme(newTheme!),
-            //     title: Text(theme.name), // You can create a getter for a more user-friendly name
-            //     subtitle: Text('A theme description'), // Add to localizations
-            //   );
-            // }),
-          ],
-        ),
-      );
-    });
+      ),
+    );
   }
 
   void _showLanguagePickerDialog(

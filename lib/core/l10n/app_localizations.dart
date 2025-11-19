@@ -637,6 +637,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
+
+  /// First name TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get firstNameLabel;
+
+  /// Last name TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name'**
+  String get lastNameLabel;
+
+  /// Email TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// Password TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// Confirm Password TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPasswordLabel;
+
+  /// Missing first name error message
+  ///
+  /// In en, this message translates to:
+  /// **'First name is required'**
+  String get firstNameRequired;
+
+  /// Phone TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phoneLabel;
+
+  /// Missing phone number error message
+  ///
+  /// In en, this message translates to:
+  /// **'phone number name is required'**
+  String get phoneRequired;
+
+  /// Missingrror message
+  ///
+  /// In en, this message translates to:
+  /// **'Last name is required'**
+  String get lastNameRequired;
+
+  /// Address TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get addressLabel;
+
+  /// Missing address error message
+  ///
+  /// In en, this message translates to:
+  /// **'Address is required'**
+  String get addressRequired;
+
+  /// City TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get cityLabel;
+
+  /// Missing city error message
+  ///
+  /// In en, this message translates to:
+  /// **'City is required'**
+  String get cityRequired;
+
+  /// State TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'State'**
+  String get stateLabel;
+
+  /// Missing state error message
+  ///
+  /// In en, this message translates to:
+  /// **'State is required'**
+  String get stateRequired;
+
+  /// Country TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get countryLabel;
+
+  /// Missing country error message
+  ///
+  /// In en, this message translates to:
+  /// **'Country is required'**
+  String get countryRequired;
+
+  /// Zip Code TextFormField
+  ///
+  /// In en, this message translates to:
+  /// **'Zip Code'**
+  String get zipCodeLabel;
+
+  /// Missing zip code error message
+  ///
+  /// In en, this message translates to:
+  /// **'Zip Code is required'**
+  String get zipCodeRequired;
+
+  /// Delete Account label
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccount;
+
+  /// Delete Account label confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete Account'**
+  String get deleteAccountConfirmation;
+
+  /// Display name label
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get displayName;
+
+  /// Display delete account hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please type DELETE to confirm.'**
+  String get deleteAccountHint;
 }
 
 class _AppLocalizationsDelegate

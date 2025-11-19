@@ -6,7 +6,6 @@ import 'package:suefery_partner/data/repositories/i_repo_auth.dart';
 import 'package:suefery_partner/data/repositories/i_repo_firestore.dart';
 import 'package:suefery_partner/data/repositories/repo_firestore.dart';
 import 'package:suefery_partner/data/services/order_service.dart';
-import 'package:suefery_partner/data/services/user_service.dart';
 import 'data/repositories/i_repo_pref.dart';
 import 'data/services/auth_service.dart';
 import 'data/services/inventory_service.dart';
@@ -63,10 +62,6 @@ Future<void> initLocator(FirebaseApp firebaseApp) async {
         sl<IRepoPref>(), // GetIt finds the registered IPrefsRepository
       ));
       
-  // User Service
-  sl.registerLazySingleton<UserService>(() => UserService(
-        sl<IRepoFirestore>(), // GetIt finds the registered IFirestoreRepository
-  ));
   // Inventory Service
   sl.registerLazySingleton<InventoryService>(() => InventoryService(
        sl<IRepoFirestore>(), // GetIt finds the registered IFirestoreRepository

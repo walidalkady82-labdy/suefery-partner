@@ -13,7 +13,6 @@ import '../../data/enums/partner_status.dart';
 import '../../data/models/product_model.dart';
 import '../../data/models/quoted_item.dart';
 import '../../data/services/logging_service.dart';
-import '../../data/services/user_service.dart';
 
 /// --- STATE ---
 class OrderState {
@@ -57,7 +56,7 @@ class OrderCubit extends Cubit<OrderState> {
   final _log = LoggerRepo('OrderCubit');
   // --- Dependencies ---
   final OrderService _orderService = sl<OrderService>();
-  final UserService _userService = sl<UserService>();
+  final AuthService _authService = sl<AuthService>();
   // final PaymentService _paymentService; // Uncomment when ready
 
   StreamSubscription? _draftOrdersSubscription;
@@ -100,7 +99,7 @@ class OrderCubit extends Cubit<OrderState> {
     
     // Listen to Partner Status
     _statusSubscription?.cancel();
-    _statusSubscription = _userService.getPartnerStatusStream(storeId).listen((partnerStatus) {
+    _statusSubscription = _authService.getPartnerStatusStream(storeId).listen((partnerStatus) {
       if (!state.isLoading) {
         emit(state.copyWith(partnerStatus: partnerStatus));
       } else {

@@ -8,16 +8,18 @@ import 'package:suefery_partner/data/services/auth_service.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 import 'package:suefery_partner/locator.dart';
 import '../../data/enums/user_role.dart';
-import '../../data/services/user_service.dart';
 
 final _log = LoggerRepo('LoginState');
 
 class AuthState {
   final bool isLoading;
   final String errorMessage;
+  final String firstName;
+  final String lastName;
   final String email;
   final String password;
   final String confirmPassword;
+  final String phone;
   final AutovalidateMode autovalidateMode;
   final bool obscureText;
   final bool isLogin;
@@ -27,9 +29,12 @@ class AuthState {
   const AuthState({
     this.isLoading = false,
     this.errorMessage = '',
+    this.firstName = '',
+    this.lastName = '',
     this.email = '',
     this.password = '',
     this.confirmPassword = '',
+    this.phone = '',
     this.autovalidateMode = AutovalidateMode.disabled,
     this.obscureText = true,
     this.isLogin = true,
@@ -39,9 +44,12 @@ class AuthState {
   AuthState copyWith({
     bool? isLoading,
     String? errorMessage,
+    String? firstName,
+    String? lastName,
     String? email,
     String? password,
     String? confirmPassword,
+    String? phone,
     AutovalidateMode? autovalidateMode,
     bool? obscureText,
     bool? isLogin,
@@ -51,9 +59,12 @@ class AuthState {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,      
       errorMessage: errorMessage ?? this.errorMessage, 
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
       email: email ?? this.email,
       password: password ?? this.password,
       confirmPassword: confirmPassword ?? this.confirmPassword,
+      phone: phone ?? this.phone,
       autovalidateMode: autovalidateMode ?? this.autovalidateMode,
       obscureText: obscureText ?? this.obscureText,
       isLogin: isLogin ?? this.isLogin,
@@ -151,8 +162,20 @@ class AuthCubit extends Cubit<AuthState> {
     emit(state.copyWith(isLoading: loadingState));
   }
 
+  void updateFirsttName(String? firstName) {
+    emit(state.copyWith(firstName: firstName));
+  }
+
+  void updateLastName(String? lastName) {
+    emit(state.copyWith(lastName: lastName));
+  }
+
   void updateEmail(String? email) {
     emit(state.copyWith(email: email));
+  }
+
+  void updatePhone(String? phone) {
+    emit(state.copyWith(phone: phone));
   }
 
   void updatePassword(String? password) {
@@ -242,6 +265,9 @@ class AuthCubit extends Cubit<AuthState> {
       await _authService.signUpWithEmailAndPassword(
         email: formState.email.trim(),
         password: formState.password,
+        firstName: formState.firstName,
+        lastName: formState.lastName,
+        phone: formState.phone,
       );
       // On success, the auth state stream will handle navigation.
     } catch (e) {
@@ -299,7 +325,21 @@ class AuthCubit extends Cubit<AuthState> {
       _log.e(errorMessage);
     }
   }
-  
+
+  Future<void> deleteUser() async {
+    emit(state.copyWith(isLoading: true, errorMessage: ''));
+    try {
+      await _authService.deleteUser();
+      // The auth stream will automatically emit unauthenticated state upon success.
+    } catch (e) {
+      final errorMessage = 'Failed to delete account: ${e.toString()}';
+      _log.e(errorMessage);
+      emit(state.copyWith(isLoading: false, errorMessage: errorMessage));
+    } finally {
+      // Ensure loading is always turned off if the state is still Unauthenticated
+    }
+  }
+
   @override
   Future<void> close() {
     _authStatusSubscription.cancel();

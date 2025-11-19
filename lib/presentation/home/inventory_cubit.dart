@@ -48,9 +48,9 @@ class InventoryCubit extends Cubit<InventoryState> {
     _productsSubscription?.cancel();
     _productsSubscription = _inventoryService.getProductsStream(storeId).listen(
       (products) {
-        emit(state.copyWith(products:  products));
+        emit(state.copyWith(products: products, isLoading: false, error: ''));
       },
-      onError: (e) => emit(state.copyWith(error:  e.toString())),
+      onError: (e) => emit(state.copyWith(error: e.toString(), isLoading: false)),
     );
   }
 

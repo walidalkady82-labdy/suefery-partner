@@ -5,8 +5,8 @@ import '../../data/enums/auth_status.dart';
 import 'auth_cubit.dart';
 
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class LoginScreen1 extends StatelessWidget {
+  const LoginScreen1({super.key});
   @override
   Widget build(BuildContext context) {
     final strings = context.l10n;
@@ -116,6 +116,118 @@ class LoginScreen extends StatelessWidget {
               )
 
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = context.l10n;
+    final authCubit = context.read<AuthCubit>();
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    return Scaffold(
+      // Using theme background color
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(strings.loginTextButton),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: BlocConsumer<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state.errorMessage.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage),
+                    backgroundColor: theme.colorScheme.error,
+                  ),
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state.isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  // Logo Icon
+                  Icon(
+                    Icons.delivery_dining, 
+                    size: 80, 
+                    color: theme.primaryColor
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Title
+                  Text(
+                    strings.logInPrompt, // "Welcome Back" or similar
+                    style: textTheme.headlineLarge?.copyWith(
+                      color: theme.primaryColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  // Email Input
+                  TextFormField(
+                    initialValue: state.email,
+                    decoration: InputDecoration(
+                      labelText: strings.email,
+                      prefixIcon: const Icon(Icons.email_outlined),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    onChanged: authCubit.updateEmail,
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Password Input
+                  TextFormField(
+                    initialValue: state.password,
+                    decoration: InputDecoration(
+                      labelText: strings.password,
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          state.obscureText 
+                          ? Icons.visibility_off 
+                          : Icons.visibility
+                        ),
+                        onPressed: authCubit.toggleObscureText,
+                      ),
+                    ),
+                    obscureText: state.obscureText,
+                    onChanged: authCubit.updatePassword,
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Login Button
+                  ElevatedButton(
+                    onPressed: authCubit.signIn,
+                    child: Text(strings.loginTextButton),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Toggle to Sign Up
+                  TextButton(
+                    onPressed: authCubit.togglePage,
+                    child: Text(strings.toSignup),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),

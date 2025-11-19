@@ -90,5 +90,30 @@
   "productDescriptionRequired" : "وصف المنتج مطلوب",
   "productPriceInvalid" : "السعر غير صالح",
   "delete" : "حذف",
-  "productBrandRequired" : " مصنع المنتج مطلوب"
+  "productBrandRequired" : " مصنع المنتج مطلوب",
+  "firstNameLabel" : "الاسم الأول",
+  "lastNameLabel" : "الاسم الأخير",
+  "firstNameRequired" : "الاسم الأول مطلوب",
+  "lastNameRequired" : "الاسم الأخير مطلوب",
+  "phoneLabel" : "رقم الهاتف",
+  "phoneRequired" : "رقم الهاتف مطلوب",
+  "addressLabel" : "العنوان",
+  "addressRequired" : "العنوان مطلوب",
+  "cityLabel" : "المدينة",
+  "cityRequired" : "المدينة مطلوبةة",
+  "stateLabel" : "المنطقة",
+  "stateRequired" : "المنطقة مطلوبةة",
+  "zipCodeLabel" : "الرمز البريدي",
+  "zipCodeRequired" : "الرمز البريدي مطلوبة",
+  "countryLabel" : "البلد",
+  "countryRequired" : "البلد مطلوب",
+  "emailLabel" : "البريد الإلكتروني",
+  "passwordLabel" : "كلمة المرور",
+  "confirmPasswordLabel" : "تأكيد كلمة المرور",
+  "deleteAccount" : "حذف الحساب",
+  "deleteAccountConfirmation" : "تأكيد حذف الحساب",
+  "displayName" : "اسم المستخدم",
+  "deleteAccountHint" : "الرجاء كتابة DELETE للتأكيد."
+
+
 }

@@ -1,12 +1,10 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:suefery_partner/data/services/auth_service.dart';
-import 'user_service.dart';
 import '../../locator.dart';
 
 class NotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-  final UserService _userService = sl<UserService>();
   final AuthService _authService = sl<AuthService>();
 
 
@@ -51,7 +49,7 @@ class NotificationService {
       if (user != null) {
         // Only update if it's different or missing
         if (user.fcmToken != token) {
-          await _userService.updateUser(user.id,fcmToken:  token);
+          await _authService.updateUser(user.id,fcmToken:  token);
         }
       }
     } catch (e) {

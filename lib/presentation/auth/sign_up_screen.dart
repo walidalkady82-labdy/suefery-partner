@@ -5,9 +5,9 @@ import 'package:suefery_partner/core/l10n/l10n_extension.dart';
 import '../../data/enums/auth_status.dart';
 import 'auth_cubit.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen1 extends StatelessWidget {
 
-  const SignUpScreen({super.key});
+  const SignUpScreen1({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +136,163 @@ class SignUpScreen extends StatelessWidget {
                 )
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = context.l10n;
+    final authCubit = context.read<AuthCubit>();
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(strings.signUpButton),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: BlocConsumer<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state.errorMessage.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage),
+                    backgroundColor: theme.colorScheme.error,
+                  ),
+                );
+              }
+            },
+            builder: (context, state) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(
+                    strings.signUpTitle, //"Create Partner Account",
+                    style: textTheme.headlineMedium?.copyWith(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // --- Personal Info ---
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: state.firstName,
+                          decoration: InputDecoration(
+                            labelText: strings.firstNameLabel, //"First Name",
+                            prefixIcon: Icon(Icons.person),
+                          ),
+                          onChanged: authCubit.updateFirsttName,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: state.lastName,
+                          decoration: InputDecoration(
+                            labelText: strings.lastNameLabel,
+                            prefixIcon: Icon(Icons.person)
+                          ),
+                          onChanged: authCubit.updateLastName,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextFormField(
+                    initialValue: state.phone,
+                    decoration: InputDecoration(
+                      labelText: strings.phoneLabel, //"Phone Number",
+                      prefixIcon: Icon(Icons.phone),
+                    ),
+                    keyboardType: TextInputType.phone,
+                    onChanged: authCubit.updatePhone,
+                  ),
+                  const SizedBox(height: 12),
+
+                  // --- Credentials ---
+                  TextFormField(
+                    initialValue: state.email,
+                    decoration: InputDecoration(
+                      labelText: strings.email,
+                      prefixIcon: const Icon(Icons.email_outlined),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    onChanged: authCubit.updateEmail,
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextFormField(
+                    initialValue: state.password,
+                    decoration: InputDecoration(
+                      labelText: strings.password,
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(state.obscureText ? Icons.visibility_off : Icons.visibility),
+                        onPressed: authCubit.toggleObscureText,
+                      ),
+                    ),
+                    obscureText: state.obscureText,
+                    onChanged: authCubit.updatePassword,
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextFormField(
+                    initialValue: state.confirmPassword,
+                    decoration: InputDecoration(
+                      labelText: strings.confirmPasswordLabel, //"Confirm Password", // Add to ARB if missing
+                      prefixIcon: const Icon(Icons.lock_outline),
+                    ),
+                    obscureText: state.obscureText,
+                    onChanged: authCubit.updateConfirmPassword,
+                  ),
+                  const SizedBox(height: 32),
+
+                  // --- Action Buttons ---
+                  ElevatedButton(
+                    onPressed: state.isLoading ? null : () {
+                      if (state.password != state.confirmPassword) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Passwords do not match")),
+                        );
+                        return;
+                      }
+                      authCubit.signUp();
+                    },
+                    child: state.isLoading
+                        ? const SizedBox(
+                            width: 24, 
+                            height: 24, 
+                            child: CircularProgressIndicator(color: Colors.white)
+                          )
+                        : Text(strings.signUpButton),
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextButton(
+                    onPressed: authCubit.togglePage,
+                    child: Text(strings.loginTextButton),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
