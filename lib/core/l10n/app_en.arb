@@ -1,82 +1,386 @@
 {
-    "@@locale": "en",
-    "appTitle": "Suefery Partner",
-    "@appTitle": {"description": "The main title for the complete multi-role application."},
-    "tabOrders": "Orders",
-    "tabInventory": "Inventory",
-    "newOrders": "New Orders",
-    "preparing": "Preparing",
-    "noNewOrders": "No new orders at the moment.",
-    "acceptOrder": "Accept",
-    "rejectOrder": "Reject",
-    "orderReady": "Mark as Ready",
-    "inStock": "In Stock",
-    "outOfStock": "Out of Stock",
-    "welcome": "Welcome!",
-    "loadingInventory": "Loading inventory...",
-    "orderNumber": "Order #{orderId}",
-    "@orderNumber": {
-        "description": "Title for an order with its ID",
-        "placeholders": {
-            "orderId": {}
-        }
-    },
-    "totalPrice": "Total: {total} {currency}",
-    "profileTitle": "Profile",
-    "noUserLoggedIn": "No user logged in.",
-    "noName": "No Name",
-    "noEmail": "No Email",
-    "verifyEmailTitle": "Verify Your Email",
-    "verifyEmailBody": "A verification link has been sent to your email address. Please click the link to continue.",
-    "verifyEmailResendButton": "Resend Email",
-    "verifyEmailBackButton": "Back to Login",
-    "profileTitle": "Profile",
-    "noUserLoggedIn": "No user logged in.",
-    "noName": "No Name",
-    "noEmail": "No Email",
-    "settingsTitle": "Settings",
-    "changeLanguage": "Change Language",
-    "currentLanguage": "Current: {languageCode}",
-    "@currentLanguage": {
-        "placeholders": {
-            "languageCode": {}
-        }
-    },
-    "darkMode": "Dark Mode",
-    "selectLanguage": "Select Language",
-    "signUpTitle": "Create SUEFERY Account",
-    "signUpDisclaimer": "New accounts default to Customer role. Rider/Partner accounts require manual vetting after sign-up.",
-    "emailHint": "Email",
-    "passwordHint": "Password",
-    "confirmPasswordHint": "Confirm Password",
-    "signUpButton": "Sign Up",
-    "loginTextButton": "Already have an account? Login",
-    "loginTitle": "Login to SUEFERY",
-    "loginButton": "Login",
-    "signUpTextButton": "Don't have an account? Sign Up",
-    "forgotPasswordButton": "Forgot Password?",
-    "emailEmptyError": "Email cannot be empty",
-    "passwordEmptyError": "Password cannot be empty",
-    "passwordsDoNotMatchError": "Passwords do not match",
-    "passwordLengthError": "Password must be at least 6 characters.",
-    "orSignInWith": "Or sign in with",
-    "verificationNeeded": "Vreification is needed to continue",
-    "checkStatusButton": "Check Status",
-    "toSignup" : "To Signup",
-    "toLogin" : "To Login",
-    "googleSignin" : "Sign in with Google",
-    "facebookSignin" : "Sign in with Facebook",
-    "twitterSignin" : "Sign in with Twitter",
-    "logInPrompt" : "Login",
-    "addProduct": "Add Product",
-    "productNameHint": "Product Name",
-    "productPriceHint": "Price",
-    "productDescriptionHint": "Description (optional)",
-    "save": "Save",
-    "cancel": "Cancel",
-    "nameCannotBeEmpty": "Name cannot be empty",
-    "priceInvalid": "Please enter a valid price",
-    "editProduct": "Edit Product",
-    "update": "Update",
-    "search" : "Search"
+  "@@locale": "en",
+  "appTitle": "Suefery Partner",
+  "@appTitle": {
+    "description": "The main title for the complete multi-role application."
+  },
+  "tabOrders": "Orders",
+  "@tabOrders": {
+    "description": "Label for the Orders navigation tab."
+  },
+  "tabInventory": "Inventory",
+  "@tabInventory": {
+    "description": "Label for the Inventory navigation tab."
+  },
+  "newOrders": "New Orders",
+  "@newOrders": {
+    "description": "Section title for recently received orders."
+  },
+  "preparing": "Preparing",
+  "@preparing": {
+    "description": "Label for orders that are currently being prepared."
+  },
+  "noNewOrders": "No new orders at the moment.",
+  "@noNewOrders": {
+    "description": "Message shown when there are no new orders."
+  },
+  "submitQuote": "Submit Quote to Customer",
+  "@submitQuote": {
+    "description": "Button text to send the final quote price back to the customer."
+  },
+  "totalQuote": "New Total",
+  "@totalQuote": {
+    "description": "Label for the newly calculated total price after quoting."
+  },
+  "welcome": "Welcome, Partner",
+  "@welcome": {
+    "description": "A general greeting message."
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Label for the email input field."
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Label for the password input field."
+  },
+  "login": "Login",
+  "@login": {
+    "description": "General action or button text for logging in."
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Button text to log out of the application."
+  },
+  "loadingInventory": "Loading inventory...",
+  "@loadingInventory": {
+    "description": "Loading state message while fetching product inventory."
+  },
+  "orderNumber": "Order #{orderId}",
+  "@orderNumber": {
+    "description": "Title for an order with its ID",
+    "placeholders": {
+      "orderId": {
+        "type": "String",
+        "example": "12345"
+      }
+    }
+  },
+  "totalPrice": "Total: {total} {currency}",
+  "@totalPrice": {
+    "description": "The combined total price of an order with its currency.",
+    "placeholders": {
+      "total": {
+        "type": "double",
+        "example": "150.00"
+      },
+      "currency": {
+        "type": "String",
+        "example": "EGP"
+      }
+    }
+  },
+  "profileTitle": "Profile",
+  "@profileTitle": {
+    "description": "Title for the user profile screen."
+  },
+  "noUserLoggedIn": "No user logged in.",
+  "@noUserLoggedIn": {
+    "description": "Message shown when no user session is active."
+  },
+  "noName": "No Name",
+  "@noName": {
+    "description": "Placeholder text when a user's name is not available."
+  },
+  "noEmail": "No Email",
+  "@noEmail": {
+    "description": "Placeholder text when a user's email is not available."
+  },
+  "verifyEmailTitle": "Verify Your Email",
+  "@verifyEmailTitle": {
+    "description": "Title for the email verification screen."
+  },
+  "verifyEmailBody": "A verification link has been sent to your email address. Please click the link to continue.",
+  "@verifyEmailBody": {
+    "description": "Instructional text about the email verification process."
+  },
+  "verifyEmailResendButton": "Resend Email",
+  "@verifyEmailResendButton": {
+    "description": "Button text to resend the verification email."
+  },
+  "verifyEmailBackButton": "Back to Login",
+  "@verifyEmailBackButton": {
+    "description": "Button text to return to the login screen."
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Title for the application settings screen."
+  },
+  "changeLanguage": "Change Language",
+  "@changeLanguage": {
+    "description": "Label for the language selection option."
+  },
+  "currentLanguage": "Current: {languageCode}",
+  "@currentLanguage": {
+    "description": "Shows the currently selected language code.",
+    "placeholders": {
+      "languageCode": {
+        "type": "String",
+        "example": "en"
+      }
+    }
+  },
+  "darkMode": "Dark Mode",
+  "@darkMode": {
+    "description": "Toggle switch label for dark mode."
+  },
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Title for the language selection dialog."
+  },
+  "signUpTitle": "Create SUEFERY Account",
+  "@signUpTitle": {
+    "description": "Title for the sign-up screen."
+  },
+  "signUpDisclaimer": "New accounts default to Customer role. Rider/Partner accounts require manual vetting after sign-up.",
+  "@signUpDisclaimer": {
+    "description": "A notice explaining role default and vetting process."
+  },
+  "emailHint": "Email",
+  "@emailHint": {
+    "description": "Hint text for the email input field (can be the same as 'email')."
+  },
+  "passwordHint": "Password",
+  "@passwordHint": {
+    "description": "Hint text for the password input field (can be the same as 'password')."
+  },
+  "confirmPasswordHint": "Confirm Password",
+  "@confirmPasswordHint": {
+    "description": "Hint text for the confirm password input field."
+  },
+  "signUpButton": "Sign Up",
+  "@signUpButton": {
+    "description": "Button text to complete the sign-up process."
+  },
+  "loginTextButton": "Already have an account? Login",
+  "@loginTextButton": {
+    "description": "Prompt for users with existing accounts."
+  },
+  "loginTitle": "Login to SUEFERY",
+  "@loginTitle": {
+    "description": "Title for the login screen."
+  },
+  "loginButton": "Login",
+  "@loginButton": {
+    "description": "Primary button for submitting login credentials (can be the same as 'login')."
+  },
+  "signUpTextButton": "Don't have an account? Sign Up",
+  "@signUpTextButton": {
+    "description": "Prompt for users who need to create an account."
+  },
+  "forgotPasswordButton": "Forgot Password?",
+  "@forgotPasswordButton": {
+    "description": "Button/link to initiate the forgot password flow."
+  },
+  "emailEmptyError": "Email cannot be empty",
+  "@emailEmptyError": {
+    "description": "Error message when the email field is left blank."
+  },
+  "passwordEmptyError": "Password cannot be empty",
+  "@passwordEmptyError": {
+    "description": "Error message when the password field is left blank."
+  },
+  "passwordsDoNotMatchError": "Passwords do not match",
+  "@passwordsDoNotMatchError": {
+    "description": "Error message when confirm password does not match the original password."
+  },
+  "passwordLengthError": "Password must be at least 6 characters.",
+  "@passwordLengthError": {
+    "description": "Error message for passwords that are too short."
+  },
+  "orSignInWith": "Or sign in with",
+  "@orSignInWith": {
+    "description": "Separator text before social sign-in options."
+  },
+  "verificationNeeded": "Verification is needed to continue",
+  "@verificationNeeded": {
+    "description": "Status message indicating the user must verify their account."
+  },
+  "checkStatusButton": "Check Status",
+  "@checkStatusButton": {
+    "description": "Button to check the current status of the account/verification."
+  },
+  "toSignup": "To Signup",
+  "@toSignup": {
+    "description": "Generic navigation text to the signup page."
+  },
+  "toLogin": "To Login",
+  "@toLogin": {
+    "description": "Generic navigation text to the login page."
+  },
+  "googleSignin": "Sign in with Google",
+  "@googleSignin": {
+    "description": "Button text for signing in using Google."
+  },
+  "facebookSignin": "Sign in with Facebook",
+  "@facebookSignin": {
+    "description": "Button text for signing in using Facebook."
+  },
+  "twitterSignin": "Sign in with Twitter",
+  "@twitterSignin": {
+    "description": "Button text for signing in using Twitter."
+  },
+  "logInPrompt": "Login",
+  "@logInPrompt": {
+    "description": "A simplified prompt for the login action."
+  },
+  "addProduct": "Add Product",
+  "@addProduct": {
+    "description": "Button or title for adding a new product to inventory."
+  },
+  "productPriceHint": "Price",
+  "@productPriceHint": {
+    "description": "Hint text for the product price input."
+  },
+  "productDescriptionHint": "Description (optional)",
+  "@productDescriptionHint": {
+    "description": "Hint text for the product description input."
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Generic button text to save changes."
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Generic button text to cancel an action."
+  },
+  "nameCannotBeEmpty": "Name cannot be empty",
+  "@nameCannotBeEmpty": {
+    "description": "Error message for when a required name field is empty."
+  },
+  "priceInvalid": "Please enter a valid price",
+  "@priceInvalid": {
+    "description": "Error message for invalid price input."
+  },
+  "editProduct": "Edit Product",
+  "@editProduct": {
+    "description": "Title or button to edit an existing product."
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Button text to update changes (often used instead of 'Save' for edits)."
+  },
+  "inStock": "In Stock",
+  "@inStock": {
+    "description": "Status label for a product that is available."
+  },
+  "outOfStock": "Out of Stock",
+  "@outOfStock": {
+    "description": "Status label for a product that is unavailable."
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Generic loading indicator text."
+  },
+  "noDraftOrders": "No new quote requests.",
+  "@noDraftOrders": {
+    "description": "Message shown when there are no new orders requiring a quote."
+  },
+  "acceptOrder": "Accept",
+  "@acceptOrder": {
+    "description": "Button text to accept a new order request."
+  },
+  "rejectOrder": "Reject",
+  "@rejectOrder": {
+    "description": "Button text to reject a new order request."
+  },
+  "draftOrders": "New Requests",
+  "@draftOrders": {
+    "description": "Section or filter for orders that need a quote/review."
+  },
+  "confirmedOrders": "Confirmed Orders",
+  "@confirmedOrders": {
+    "description": "Section or filter for orders that have been accepted and are ready for preparation."
+  },
+  "orderReady": "Mark as Ready",
+  "@orderReady": {
+    "description": "Button to change the status of a confirmed order to 'Ready for Pickup/Delivery'."
+  },
+  "noConfirmedOrders": "No confirmed orders to prepare.",
+  "@noConfirmedOrders": {
+    "description": "Message shown when there are no confirmed orders."
+  },
+  "quoteForOrder": "Quote for Order",
+  "@quoteForOrder": {
+    "description": "Title for the screen where the partner submits an order quote."
+  },
+  "orderItems": "Order Items",
+  "@orderItems": {
+    "description": "Section title listing the items within an order."
+  },
+  "pricePerUnit": "Price/Unit",
+  "@pricePerUnit": {
+    "description": "Label for the unit price of an item."
+  },
+  "setPrice": "Set Price & Quote",
+  "@setPrice": {
+    "description": "Action button to finalize item prices and submit the quote."
+  },
+  "itemStatus": "Status",
+  "@itemStatus": {
+    "description": "Label for the availability status of an order item."
+  },
+  "available": "Available",
+  "@available": {
+    "description": "Status label indicating an item is currently available in stock."
+  },
+  "order": "Order",
+  "@order": {
+    "description": "Generic noun for an order."
+  },
+  "needsQuote": "Needs Quote",
+  "@needsQuote": {
+    "description": "Status label for an order or item that requires the partner to provide a price quote."
+  },
+  "notes" : "Notes",
+  "@notes": {
+    "description": "extra notes about the order"
+  },
+  "confirmQuote" : "Quote Confirm",
+  "@confirmQuote": {
+    "description": "Confirm on quoted items"
+  },
+  "productPrice" : "Product Price",
+  "@productPrice": {
+    "description": "Price of the product"
+  },
+
+
+  "productDescription" : "Product Description",
+  "@productDescription": {
+  "description": "Description of the product"},
+
+  "productBrand" : "Product Brand",
+  "@productBrand": {
+  "description": "Brand of the product"},
+
+  "productPriceRequired" : "Product price is required",
+  "@productPriceRequired": {
+  "description": "Missing product price error message"},
+
+  "productDescriptionRequired" : "Product description is required",
+  "@productDescriptionRequired": {
+  "description": "Missing product description error message"},
+  
+  "productBrandRequired" : "Product brand is required",
+  "@productBrandRequired": {
+  "description": "Missing product brand error message"},
+
+  "productPriceInvalid" : "Product price is invalid",
+  "@productPriceInvalid": {
+  "description": "Invalide product price error message"},
+   
+  "delete" : "Delete",
+  "@delete": {
+  "description": "Delete button message"}
 }

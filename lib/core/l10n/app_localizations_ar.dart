@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appTitle => 'شريك سفري';
+  String get appTitle => 'شريك سويفري';
 
   @override
   String get tabOrders => 'الطلبات';
@@ -18,42 +18,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tabInventory => 'المخزون';
 
   @override
-  String get newOrders => 'طلبات جديدة';
+  String get newOrders => 'الطلبات الجديدة';
 
   @override
-  String get preparing => 'قيد التجهيز';
+  String get preparing => 'قيد التحضير';
 
   @override
   String get noNewOrders => 'لا توجد طلبات جديدة في الوقت الحالي.';
 
   @override
-  String get acceptOrder => 'قبول';
+  String get submitQuote => 'إرسال عرض السعر للعميل';
 
   @override
-  String get rejectOrder => 'رفض';
+  String get totalQuote => 'الإجمالي الجديد';
 
   @override
-  String get orderReady => 'تحديد كجاهز';
+  String get welcome => 'مرحباً بك، أيها الشريك';
 
   @override
-  String get inStock => 'متوفر';
+  String get email => 'البريد الإلكتروني';
 
   @override
-  String get outOfStock => 'غير متوفر';
+  String get password => 'كلمة المرور';
 
   @override
-  String get welcome => 'أهلاً بك!';
+  String get login => 'تسجيل الدخول';
+
+  @override
+  String get logout => 'تسجيل الخروج';
 
   @override
   String get loadingInventory => 'جاري تحميل المخزون...';
 
   @override
-  String orderNumber(Object orderId) {
-    return 'طلب رقم #$orderId';
+  String orderNumber(String orderId) {
+    return 'طلب رقم $orderId';
   }
 
   @override
-  String totalPrice(Object currency, Object total) {
+  String totalPrice(double total, String currency) {
     return 'الإجمالي: $total $currency';
   }
 
@@ -61,7 +64,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileTitle => 'الملف الشخصي';
 
   @override
-  String get noUserLoggedIn => 'لم يتم تسجيل دخول أي مستخدم.';
+  String get noUserLoggedIn => 'لا يوجد مستخدم مسجل الدخول.';
 
   @override
   String get noName => 'لا يوجد اسم';
@@ -80,7 +83,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get verifyEmailResendButton => 'إعادة إرسال البريد الإلكتروني';
 
   @override
-  String get verifyEmailBackButton => 'العودة إلى تسجيل الدخول';
+  String get verifyEmailBackButton => 'العودة لتسجيل الدخول';
 
   @override
   String get settingsTitle => 'الإعدادات';
@@ -89,7 +92,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get changeLanguage => 'تغيير اللغة';
 
   @override
-  String currentLanguage(Object languageCode) {
+  String currentLanguage(String languageCode) {
     return 'الحالية: $languageCode';
   }
 
@@ -100,11 +103,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectLanguage => 'اختر اللغة';
 
   @override
-  String get signUpTitle => 'إنشاء حساب سفري';
+  String get signUpTitle => 'إنشاء حساب سويفري';
 
   @override
   String get signUpDisclaimer =>
-      'يتم تعيين الحسابات الجديدة كعميل افتراضيًا. تتطلب حسابات السائقين والشركاء فحصًا يدويًا بعد التسجيل.';
+      'الحسابات الجديدة تكون \'عميل\' افتراضياً. حسابات الشريك/الرائد تتطلب فحصاً يدوياً بعد التسجيل.';
 
   @override
   String get emailHint => 'البريد الإلكتروني';
@@ -116,50 +119,50 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmPasswordHint => 'تأكيد كلمة المرور';
 
   @override
-  String get signUpButton => 'إنشاء حساب';
+  String get signUpButton => 'تسجيل';
 
   @override
-  String get loginTextButton => 'لديك حساب بالفعل؟ تسجيل الدخول';
+  String get loginTextButton => 'هل لديك حساب بالفعل؟ سجل الدخول';
 
   @override
-  String get loginTitle => 'تسجيل الدخول إلى سفري';
+  String get loginTitle => 'تسجيل الدخول إلى سويفري';
 
   @override
   String get loginButton => 'تسجيل الدخول';
 
   @override
-  String get signUpTextButton => 'ليس لديك حساب؟ إنشاء حساب';
+  String get signUpTextButton => 'ليس لديك حساب؟ سجل الآن';
 
   @override
   String get forgotPasswordButton => 'هل نسيت كلمة المرور؟';
 
   @override
-  String get emailEmptyError => 'لا يمكن أن يكون البريد الإلكتروني فارغًا';
+  String get emailEmptyError => 'لا يمكن أن يكون البريد الإلكتروني فارغاً';
 
   @override
   String get passwordEmptyError => 'لا يمكن أن تكون كلمة المرور فارغة';
 
   @override
-  String get passwordsDoNotMatchError => 'كلمات المرور غير متطابقة';
+  String get passwordsDoNotMatchError => 'كلمتا المرور غير متطابقتين';
 
   @override
   String get passwordLengthError =>
       'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.';
 
   @override
-  String get orSignInWith => 'أو سجل الدخول باستخدام';
+  String get orSignInWith => 'أو سجل الدخول بواسطة';
 
   @override
-  String get verificationNeeded => 'يجب التحقق';
+  String get verificationNeeded => 'التحقق مطلوب للمتابعة';
 
   @override
-  String get checkStatusButton => 'تحقق من حالة الطلب';
+  String get checkStatusButton => 'تحقق من الحالة';
 
   @override
-  String get toSignup => 'الاشتراك';
+  String get toSignup => 'للتسجيل';
 
   @override
-  String get toLogin => 'تسجيل الدخول';
+  String get toLogin => 'لتسجيل الدخول';
 
   @override
   String get googleSignin => 'تسجيل الدخول باستخدام جوجل';
@@ -177,9 +180,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addProduct => 'إضافة منتج';
 
   @override
-  String get productNameHint => 'اسم المنتج';
-
-  @override
   String get productPriceHint => 'السعر';
 
   @override
@@ -192,10 +192,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cancel => 'إلغاء';
 
   @override
-  String get nameCannotBeEmpty => 'لا يمكن أن يكون الاسم فارغًا';
+  String get nameCannotBeEmpty => 'لا يمكن أن يكون الاسم فارغاً';
 
   @override
-  String get priceInvalid => 'الرجاء إدخال سعر صحيح';
+  String get priceInvalid => 'الرجاء إدخال سعر صالح';
 
   @override
   String get editProduct => 'تعديل المنتج';
@@ -204,5 +204,86 @@ class AppLocalizationsAr extends AppLocalizations {
   String get update => 'تحديث';
 
   @override
-  String get search => 'بحث';
+  String get inStock => 'متوفر في المخزون';
+
+  @override
+  String get outOfStock => 'غير متوفر';
+
+  @override
+  String get loading => 'جاري التحميل...';
+
+  @override
+  String get noDraftOrders => 'لا توجد طلبات عروض أسعار جديدة.';
+
+  @override
+  String get acceptOrder => 'قبول';
+
+  @override
+  String get rejectOrder => 'رفض';
+
+  @override
+  String get draftOrders => 'طلبات جديدة';
+
+  @override
+  String get confirmedOrders => 'الطلبات المؤكدة';
+
+  @override
+  String get orderReady => 'تحديد كجاهز';
+
+  @override
+  String get noConfirmedOrders => 'لا توجد طلبات مؤكدة للتحضير.';
+
+  @override
+  String get quoteForOrder => 'عرض سعر للطلب';
+
+  @override
+  String get orderItems => 'عناصر الطلب';
+
+  @override
+  String get pricePerUnit => 'السعر للوحدة';
+
+  @override
+  String get setPrice => 'تحديد السعر وعرضه';
+
+  @override
+  String get itemStatus => 'الحالة';
+
+  @override
+  String get available => 'متوفر';
+
+  @override
+  String get order => 'الطلب';
+
+  @override
+  String get needsQuote => 'يحتاج إلى عرض سعر';
+
+  @override
+  String get notes => 'ملاحظات';
+
+  @override
+  String get confirmQuote => 'تأكيد عرض السعر';
+
+  @override
+  String get productPrice => 'السعر';
+
+  @override
+  String get productDescription => 'وصف المنتج';
+
+  @override
+  String get productBrand => 'مصنع المنتج';
+
+  @override
+  String get productPriceRequired => 'السعر مطلوب';
+
+  @override
+  String get productDescriptionRequired => 'وصف المنتج مطلوب';
+
+  @override
+  String get productBrandRequired => ' مصنع المنتج مطلوب';
+
+  @override
+  String get productPriceInvalid => 'السعر غير صالح';
+
+  @override
+  String get delete => 'حذف';
 }

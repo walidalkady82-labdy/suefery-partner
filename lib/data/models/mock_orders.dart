@@ -13,18 +13,18 @@ class MockOrders {
     status: OrderStatus.draft,
     createdAt: DateTime.now().subtract(const Duration(hours: 1)),
     items: const [
-      OrderItem(
-        productId: 'prod-01',
-        name: 'Margherita Pizza',
+      OrderItemModel(
+        id: 'prod-01',
+        description: 'Margherita Pizza',
         quantity: 2,
-        unitPrice: 50.25,
+        unitPrice: 50.25, brand: '', category: '',
       ),
-      OrderItem(
-        productId: 'prod-02',
-        name: 'Pepsi',
+      OrderItemModel(
+        id: 'prod-02',
+        description: 'Pepsi',
         quantity: 4,
         unitPrice: 15.00,
-        notes: 'Diet Pepsi if available',
+        notes: 'Diet Pepsi if available', brand: '', category: '',
       ),
     ],
   );
@@ -39,11 +39,11 @@ class MockOrders {
     status: OrderStatus.draft,
     createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
     items: const [
-      OrderItem(
-        productId: 'prod-03',
-        name: 'Chicken Burger',
+      OrderItemModel(
+        id: 'prod-03',
+        description: 'Chicken Burger',
         quantity: 3,
-        unitPrice: 25.00,
+        unitPrice: 25.00, brand: '', category: '',
       ),
     ],
   );
@@ -59,17 +59,17 @@ class MockOrders {
     createdAt: DateTime.now().subtract(const Duration(days: 1)),
     finishedAt: DateTime.now().subtract(const Duration(hours: 23)),
     items: const [
-      OrderItem(
-        productId: 'prod-04',
-        name: 'Family Meal',
+      OrderItemModel(
+        id: 'prod-04',
+        description: 'Family Meal',
         quantity: 1,
-        unitPrice: 150.00,
+        unitPrice: 150.00, brand: '', category: '',
       ),
-      OrderItem(
-        productId: 'prod-05',
-        name: 'Extra Fries',
+      OrderItemModel(
+        id: 'prod-05',
+        description: 'Extra Fries',
         quantity: 2,
-        unitPrice: 30.00,
+        unitPrice: 30.00, brand: '', category: '',
       ),
     ],
   );

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:suefery_partner/data/enums/order_status.dart';
 
+import '../enums/item_status.dart';
+
 /// The main model for an order saved in the database.
 /// This replaces `StructuredOrder`.
 class OrderModel extends Equatable {
@@ -9,9 +11,9 @@ class OrderModel extends Equatable {
   final String customerId; 
   final String partnerId; 
   final String riderId;
-  final double total;
+  final double? total;
   final OrderStatus status;
-  final List<OrderItem> items;
+  final List<OrderItemModel> items;
   final DateTime createdAt;
   final DateTime? finishedAt;
 
@@ -20,7 +22,7 @@ class OrderModel extends Equatable {
     required this.customerId,
     required this.partnerId,
     required this.riderId,
-    required this.total,
+    this.total,
     required this.status,
     required this.items,
     required this.createdAt,
@@ -30,6 +32,30 @@ class OrderModel extends Equatable {
   @override
   List<Object?> get props => [id, customerId,partnerId, riderId, status, items, createdAt];
 
+  factory OrderModel.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+    // MODIFIED: Parse the 'items' list from Firestore maps
+    var itemsList = <OrderItemModel>[];
+    if (data['items'] is List) {
+      itemsList = (data['items'] as List)
+          .map((itemMap) => OrderItemModel.fromMap(itemMap as Map<String, dynamic>))
+          .toList();
+    }
+
+    return OrderModel(
+      id: doc.id,
+      customerId: data['customerId'] ?? 'unknown',
+      partnerId: data['partnerId'] ?? 'unknown',
+      riderId: data['riderId'] ?? 'unknown',
+      total: data['total'] as double?, 
+      items: itemsList, 
+      status: OrderStatusExtension.fromString(data['status'] ?? 'draft'),
+      createdAt: data['createdAt'] ?? Timestamp.now(),
+      finishedAt: (data['finishedAt'] as Timestamp?)?.toDate(),
+    );
+  }
+
   factory OrderModel.fromMap(Map<String, dynamic> map) {
     return OrderModel(
       id: map['id'] as String,
@@ -37,11 +63,10 @@ class OrderModel extends Equatable {
       partnerId: map['partnerId'] as String,
       riderId: map['riderId'] as String,
       total: (map['estimatedTotal'] as num).toDouble(),
-      status: OrderStatus.values
-          .firstWhere((e) => e.name == map['status'], orElse: () => OrderStatus.draft),
       items: (map['items'] as List)
-          .map((itemMap) => OrderItem.fromMap(itemMap))
+          .map((itemMap) => OrderItemModel.fromMap(itemMap))
           .toList(),
+      status: OrderStatusExtension.fromString(map['status'] ?? 'draft'),
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       finishedAt: (map['finishedAt'] as Timestamp?)?.toDate(),
     );
@@ -54,7 +79,7 @@ class OrderModel extends Equatable {
     String? riderId,
     double? total,
     OrderStatus? status,
-    List<OrderItem>? items,
+    List<OrderItemModel>? items,
     DateTime? createdAt,
     DateTime? finishedAt,
   }) {
@@ -84,62 +109,78 @@ class OrderModel extends Equatable {
     };
   }
 
-  
-
 }
 
 /// An item within a confirmed [OrderModel].
-class OrderItem extends Equatable {
-  final String productId; // Was 'itemId'
-  final String name;
+class OrderItemModel extends Equatable {
+  final String id; // Was 'itemId'
+  final String description;
+  final String brand;
+  final String category;
   final double quantity;
   final double unitPrice;
+  final ItemStatus status;
   final String? notes;
 
-  const OrderItem({
-    required this.productId,
-    required this.name,
+  const OrderItemModel({
+    required this.id,
+    required this.description,
+    required this.brand,
+    required this.category,
     required this.quantity,
     required this.unitPrice,
     this.notes,
+    this.status = ItemStatus.pending,
   });
 
   @override
-  List<Object?> get props => [productId, name, quantity, unitPrice, notes];
+  List<Object?> get props => [id, description, brand, category,quantity, unitPrice, notes , status];
 
-  factory OrderItem.fromMap(Map<String, dynamic> map) {
-    return OrderItem(
-      productId: map['productId'] as String,
-      name: map['name'] as String,
+  factory OrderItemModel.fromMap(Map<String, dynamic> map) {
+    return OrderItemModel(
+      id: map['productId'] as String,
+      description: map['description'] as String,
+      brand: map['brand'] as String,
+      category: map['category'] as String,
       quantity: (map['quantity'] as num).toDouble(),
       unitPrice: (map['unitPrice'] as num).toDouble(),
       notes: map['notes'] as String?,
+      status: ItemStatusExtension.fromString(map['status'] as String? ?? 'Pending'),
     );
   }
 
-  OrderItem copyWith({
+  OrderItemModel copyWith({
     String? productId,
-    String? name,
+    String? description,
+    String? brand,
+    String? category,
     double? quantity,
     double? unitPrice,
     String? notes,
+    ItemStatus? status,
   }) {
-    return OrderItem(
-      productId: productId ?? this.productId,
-      name: name ?? this.name,
+    return OrderItemModel(
+      id: productId ?? this.id,
+      description: description ?? this.description,
+      brand: brand ?? this.brand,
+      category: category ?? this.category,
       quantity: quantity ?? this.quantity,
       unitPrice: unitPrice ?? this.unitPrice,
       notes: notes ?? this.notes,
+      status: status ?? this.status,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'productId': productId,
-      'name': name,
+      'productId': id,
+      'description': description,
+      'brand': brand,
+      'category': category,
       'quantity': quantity,
       'unitPrice': unitPrice,
       'notes': notes,
+      'status': status.name,
     };
   }
 }

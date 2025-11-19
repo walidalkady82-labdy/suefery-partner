@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:suefery_partner/core/l10n/l10n_extension.dart';
 import 'package:suefery_partner/data/models/product_model.dart';
-import 'package:suefery_partner/presentation/home/home_cubit.dart';
+
+import 'inventory_cubit.dart';
 
 class EditProductModal extends StatefulWidget {
   final ProductModel product;
@@ -14,37 +15,39 @@ class EditProductModal extends StatefulWidget {
 
 class _EditProductModalState extends State<EditProductModal> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _brandController;
-  late TextEditingController _priceController;
-  late TextEditingController _descriptionController;
+  late String _productDescription;
+  late String _productBrand;
+  late double _productPrice;
+  late bool _isAvailable;
 
   @override
   void initState() {
     super.initState();
-    _brandController = TextEditingController(text: widget.product.description);
-    _priceController = TextEditingController(text: widget.product.price.toString());
-    _descriptionController = TextEditingController(text: ''); // Assuming description is not a field yet
+    _productDescription = widget.product.description;
+    _productBrand = widget.product.brand;
+    _productPrice = widget.product.price;
+    _isAvailable = widget.product.isAvailable;
   }
 
-  @override
-  void dispose() {
-    _brandController.dispose();
-    _priceController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
-  void _submitForm() {
+  void _submit() {
     if (_formKey.currentState!.validate()) {
-      final updatedProduct = widget.product.copyWith(
-        brand: _brandController.text,
-        price: double.tryParse(_priceController.text) ?? widget.product.price,
-        description: _descriptionController.text, // Uncomment when you add description field
-      );
-
-      context.read<HomeCubit>().updateProduct(updatedProduct);
-      Navigator.of(context).pop();
+      _formKey.currentState!.save();
+      // MODIFIED: Call InventoryCubit
+      context.read<InventoryCubit>().updateProduct(
+            widget.product.id,
+            _productDescription,
+            _productBrand,
+            _productPrice,
+            _isAvailable,
+          );
+      Navigator.pop(context);
     }
+  }
+
+  void _delete() {
+    // MODIFIED: Call InventoryCubit
+    context.read<InventoryCubit>().deleteProduct(widget.product.id);
+    Navigator.pop(context);
   }
 
   @override
@@ -53,65 +56,78 @@ class _EditProductModalState extends State<EditProductModal> {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        top: 20,
-        left: 20,
-        right: 20,
+        left: 16,
+        right: 16,
+        top: 16,
       ),
       child: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(strings.editProduct, style: Theme.of(context).textTheme.headlineSmall),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: _brandController,
-                decoration: InputDecoration(labelText: strings.productNameHint),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return strings.nameCannotBeEmpty;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _priceController,
-                decoration: InputDecoration(labelText: strings.productPriceHint),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || double.tryParse(value) == null) {
-                    return strings.priceInvalid;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: strings.productDescriptionHint),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(strings.cancel),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _submitForm,
-                    child: Text(strings.update),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(strings.editProduct, style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 16),
+            TextFormField(
+              initialValue: _productDescription,
+              decoration: InputDecoration(labelText: strings.productDescription),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return strings.productDescriptionRequired;
+                }
+                return null;
+              },
+              onSaved: (value) => _productDescription = value!,
+            ),
+            TextFormField(
+              initialValue: _productPrice.toString(),
+              decoration: InputDecoration(labelText: strings.productPrice, prefixText: 'EGP '),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return strings.productPriceRequired;
+                }
+                if (double.tryParse(value) == null) {
+                  return strings.productPriceInvalid;
+                }
+                return null;
+              },
+              onSaved: (value) => _productPrice = double.parse(value!),
+            ),
+            SwitchListTile(
+              title: Text(strings.inStock),
+              value: _isAvailable,
+              onChanged: (newValue) {
+                setState(() {
+                  _isAvailable = newValue;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  onPressed: _delete,
+                  icon: const Icon(Icons.delete),
+                  label: Text(strings.delete),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                ),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(strings.cancel),
+                    ),
+                    ElevatedButton(
+                      onPressed: _submit,
+                      child: Text(strings.save),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

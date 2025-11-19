@@ -27,7 +27,8 @@ class UserModel extends Equatable {
   final PartnerStatus partnerStatus;
   final Map<String , double> location ;
   final String geohash;
-
+  final String storeId; 
+  final String? fcmToken;
 
   const UserModel({
     this.role = UserRole.partner,
@@ -51,6 +52,8 @@ class UserModel extends Equatable {
     this.partnerStatus = PartnerStatus.inactive,
     this.location = const {},
     this.geohash = "",
+    required this.storeId,
+    this.fcmToken,
   });
 
   /// A computed property for the user's full name.
@@ -82,6 +85,8 @@ class UserModel extends Equatable {
       partnerStatus: PartnerStatus.inactive,
       location: {},
       geohash: "",
+      storeId: "",
+      fcmToken: "",
     );
   }
 
@@ -110,6 +115,8 @@ class UserModel extends Equatable {
           .firstWhere((e) => e.name == map['status'], orElse: () => PartnerStatus.inactive),
       location: map['location'] as Map<String, double>,
       geohash: map['geohash'] as String,
+      storeId: map['storeId'] as String,
+      fcmToken: map['fcmToken'] as String?,
     );
   }
 
@@ -138,6 +145,8 @@ class UserModel extends Equatable {
       'status': partnerStatus,
       'location': location,
       'geohash': geohash,
+      'storeId': storeId,
+      'fcmToken': fcmToken,
     };
   }
 
@@ -162,7 +171,9 @@ class UserModel extends Equatable {
    String? website,
   PartnerStatus? partnerStatus,
   Map<String , double>? location ,
-  String? geohash
+  String? geohash,
+  String? storeId,
+  String? fcmToken,
 
   }) {
     return UserModel(
@@ -190,9 +201,15 @@ class UserModel extends Equatable {
       // represents a geographic bounding box. 
       //It is the standard, high-performance way to perform geospatial queries in Firestore
       geohash: geohash ?? this.geohash,
+      storeId: storeId ?? this.storeId,
+      fcmToken: fcmToken ?? this.fcmToken,
     );
   }
 
   @override
-  List<Object?> get props => [id,role ,email, phone, firstName, lastName, isVerified, address, city, country, postalCode, state, specificPersonaGoal, creationTimestamp, photoUrl, tags, bio, website, partnerStatus, location, geohash];
+  List<Object?> get props => [
+    id,role ,email, phone, firstName, lastName, isVerified, address, city, 
+    country, postalCode, state, specificPersonaGoal, creationTimestamp, photoUrl, tags, 
+    bio, website, partnerStatus, location, geohash, storeId, fcmToken
+  ];
 }

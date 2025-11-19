@@ -104,73 +104,79 @@ abstract class AppLocalizations {
   /// **'Suefery Partner'**
   String get appTitle;
 
-  /// No description provided for @tabOrders.
+  /// Label for the Orders navigation tab.
   ///
   /// In en, this message translates to:
   /// **'Orders'**
   String get tabOrders;
 
-  /// No description provided for @tabInventory.
+  /// Label for the Inventory navigation tab.
   ///
   /// In en, this message translates to:
   /// **'Inventory'**
   String get tabInventory;
 
-  /// No description provided for @newOrders.
+  /// Section title for recently received orders.
   ///
   /// In en, this message translates to:
   /// **'New Orders'**
   String get newOrders;
 
-  /// No description provided for @preparing.
+  /// Label for orders that are currently being prepared.
   ///
   /// In en, this message translates to:
   /// **'Preparing'**
   String get preparing;
 
-  /// No description provided for @noNewOrders.
+  /// Message shown when there are no new orders.
   ///
   /// In en, this message translates to:
   /// **'No new orders at the moment.'**
   String get noNewOrders;
 
-  /// No description provided for @acceptOrder.
+  /// Button text to send the final quote price back to the customer.
   ///
   /// In en, this message translates to:
-  /// **'Accept'**
-  String get acceptOrder;
+  /// **'Submit Quote to Customer'**
+  String get submitQuote;
 
-  /// No description provided for @rejectOrder.
+  /// Label for the newly calculated total price after quoting.
   ///
   /// In en, this message translates to:
-  /// **'Reject'**
-  String get rejectOrder;
+  /// **'New Total'**
+  String get totalQuote;
 
-  /// No description provided for @orderReady.
+  /// A general greeting message.
   ///
   /// In en, this message translates to:
-  /// **'Mark as Ready'**
-  String get orderReady;
-
-  /// No description provided for @inStock.
-  ///
-  /// In en, this message translates to:
-  /// **'In Stock'**
-  String get inStock;
-
-  /// No description provided for @outOfStock.
-  ///
-  /// In en, this message translates to:
-  /// **'Out of Stock'**
-  String get outOfStock;
-
-  /// No description provided for @welcome.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome!'**
+  /// **'Welcome, Partner'**
   String get welcome;
 
-  /// No description provided for @loadingInventory.
+  /// Label for the email input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// Label for the password input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// General action or button text for logging in.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// Button text to log out of the application.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// Loading state message while fetching product inventory.
   ///
   /// In en, this message translates to:
   /// **'Loading inventory...'**
@@ -180,301 +186,457 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Order #{orderId}'**
-  String orderNumber(Object orderId);
+  String orderNumber(String orderId);
 
-  /// No description provided for @totalPrice.
+  /// The combined total price of an order with its currency.
   ///
   /// In en, this message translates to:
   /// **'Total: {total} {currency}'**
-  String totalPrice(Object currency, Object total);
+  String totalPrice(double total, String currency);
 
-  /// No description provided for @profileTitle.
+  /// Title for the user profile screen.
   ///
   /// In en, this message translates to:
   /// **'Profile'**
   String get profileTitle;
 
-  /// No description provided for @noUserLoggedIn.
+  /// Message shown when no user session is active.
   ///
   /// In en, this message translates to:
   /// **'No user logged in.'**
   String get noUserLoggedIn;
 
-  /// No description provided for @noName.
+  /// Placeholder text when a user's name is not available.
   ///
   /// In en, this message translates to:
   /// **'No Name'**
   String get noName;
 
-  /// No description provided for @noEmail.
+  /// Placeholder text when a user's email is not available.
   ///
   /// In en, this message translates to:
   /// **'No Email'**
   String get noEmail;
 
-  /// No description provided for @verifyEmailTitle.
+  /// Title for the email verification screen.
   ///
   /// In en, this message translates to:
   /// **'Verify Your Email'**
   String get verifyEmailTitle;
 
-  /// No description provided for @verifyEmailBody.
+  /// Instructional text about the email verification process.
   ///
   /// In en, this message translates to:
   /// **'A verification link has been sent to your email address. Please click the link to continue.'**
   String get verifyEmailBody;
 
-  /// No description provided for @verifyEmailResendButton.
+  /// Button text to resend the verification email.
   ///
   /// In en, this message translates to:
   /// **'Resend Email'**
   String get verifyEmailResendButton;
 
-  /// No description provided for @verifyEmailBackButton.
+  /// Button text to return to the login screen.
   ///
   /// In en, this message translates to:
   /// **'Back to Login'**
   String get verifyEmailBackButton;
 
-  /// No description provided for @settingsTitle.
+  /// Title for the application settings screen.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
   String get settingsTitle;
 
-  /// No description provided for @changeLanguage.
+  /// Label for the language selection option.
   ///
   /// In en, this message translates to:
   /// **'Change Language'**
   String get changeLanguage;
 
-  /// No description provided for @currentLanguage.
+  /// Shows the currently selected language code.
   ///
   /// In en, this message translates to:
   /// **'Current: {languageCode}'**
-  String currentLanguage(Object languageCode);
+  String currentLanguage(String languageCode);
 
-  /// No description provided for @darkMode.
+  /// Toggle switch label for dark mode.
   ///
   /// In en, this message translates to:
   /// **'Dark Mode'**
   String get darkMode;
 
-  /// No description provided for @selectLanguage.
+  /// Title for the language selection dialog.
   ///
   /// In en, this message translates to:
   /// **'Select Language'**
   String get selectLanguage;
 
-  /// No description provided for @signUpTitle.
+  /// Title for the sign-up screen.
   ///
   /// In en, this message translates to:
   /// **'Create SUEFERY Account'**
   String get signUpTitle;
 
-  /// No description provided for @signUpDisclaimer.
+  /// A notice explaining role default and vetting process.
   ///
   /// In en, this message translates to:
   /// **'New accounts default to Customer role. Rider/Partner accounts require manual vetting after sign-up.'**
   String get signUpDisclaimer;
 
-  /// No description provided for @emailHint.
+  /// Hint text for the email input field (can be the same as 'email').
   ///
   /// In en, this message translates to:
   /// **'Email'**
   String get emailHint;
 
-  /// No description provided for @passwordHint.
+  /// Hint text for the password input field (can be the same as 'password').
   ///
   /// In en, this message translates to:
   /// **'Password'**
   String get passwordHint;
 
-  /// No description provided for @confirmPasswordHint.
+  /// Hint text for the confirm password input field.
   ///
   /// In en, this message translates to:
   /// **'Confirm Password'**
   String get confirmPasswordHint;
 
-  /// No description provided for @signUpButton.
+  /// Button text to complete the sign-up process.
   ///
   /// In en, this message translates to:
   /// **'Sign Up'**
   String get signUpButton;
 
-  /// No description provided for @loginTextButton.
+  /// Prompt for users with existing accounts.
   ///
   /// In en, this message translates to:
   /// **'Already have an account? Login'**
   String get loginTextButton;
 
-  /// No description provided for @loginTitle.
+  /// Title for the login screen.
   ///
   /// In en, this message translates to:
   /// **'Login to SUEFERY'**
   String get loginTitle;
 
-  /// No description provided for @loginButton.
+  /// Primary button for submitting login credentials (can be the same as 'login').
   ///
   /// In en, this message translates to:
   /// **'Login'**
   String get loginButton;
 
-  /// No description provided for @signUpTextButton.
+  /// Prompt for users who need to create an account.
   ///
   /// In en, this message translates to:
   /// **'Don\'t have an account? Sign Up'**
   String get signUpTextButton;
 
-  /// No description provided for @forgotPasswordButton.
+  /// Button/link to initiate the forgot password flow.
   ///
   /// In en, this message translates to:
   /// **'Forgot Password?'**
   String get forgotPasswordButton;
 
-  /// No description provided for @emailEmptyError.
+  /// Error message when the email field is left blank.
   ///
   /// In en, this message translates to:
   /// **'Email cannot be empty'**
   String get emailEmptyError;
 
-  /// No description provided for @passwordEmptyError.
+  /// Error message when the password field is left blank.
   ///
   /// In en, this message translates to:
   /// **'Password cannot be empty'**
   String get passwordEmptyError;
 
-  /// No description provided for @passwordsDoNotMatchError.
+  /// Error message when confirm password does not match the original password.
   ///
   /// In en, this message translates to:
   /// **'Passwords do not match'**
   String get passwordsDoNotMatchError;
 
-  /// No description provided for @passwordLengthError.
+  /// Error message for passwords that are too short.
   ///
   /// In en, this message translates to:
   /// **'Password must be at least 6 characters.'**
   String get passwordLengthError;
 
-  /// No description provided for @orSignInWith.
+  /// Separator text before social sign-in options.
   ///
   /// In en, this message translates to:
   /// **'Or sign in with'**
   String get orSignInWith;
 
-  /// No description provided for @verificationNeeded.
+  /// Status message indicating the user must verify their account.
   ///
   /// In en, this message translates to:
-  /// **'Vreification is needed to continue'**
+  /// **'Verification is needed to continue'**
   String get verificationNeeded;
 
-  /// No description provided for @checkStatusButton.
+  /// Button to check the current status of the account/verification.
   ///
   /// In en, this message translates to:
   /// **'Check Status'**
   String get checkStatusButton;
 
-  /// No description provided for @toSignup.
+  /// Generic navigation text to the signup page.
   ///
   /// In en, this message translates to:
   /// **'To Signup'**
   String get toSignup;
 
-  /// No description provided for @toLogin.
+  /// Generic navigation text to the login page.
   ///
   /// In en, this message translates to:
   /// **'To Login'**
   String get toLogin;
 
-  /// No description provided for @googleSignin.
+  /// Button text for signing in using Google.
   ///
   /// In en, this message translates to:
   /// **'Sign in with Google'**
   String get googleSignin;
 
-  /// No description provided for @facebookSignin.
+  /// Button text for signing in using Facebook.
   ///
   /// In en, this message translates to:
   /// **'Sign in with Facebook'**
   String get facebookSignin;
 
-  /// No description provided for @twitterSignin.
+  /// Button text for signing in using Twitter.
   ///
   /// In en, this message translates to:
   /// **'Sign in with Twitter'**
   String get twitterSignin;
 
-  /// No description provided for @logInPrompt.
+  /// A simplified prompt for the login action.
   ///
   /// In en, this message translates to:
   /// **'Login'**
   String get logInPrompt;
 
-  /// No description provided for @addProduct.
+  /// Button or title for adding a new product to inventory.
   ///
   /// In en, this message translates to:
   /// **'Add Product'**
   String get addProduct;
 
-  /// No description provided for @productNameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Product Name'**
-  String get productNameHint;
-
-  /// No description provided for @productPriceHint.
+  /// Hint text for the product price input.
   ///
   /// In en, this message translates to:
   /// **'Price'**
   String get productPriceHint;
 
-  /// No description provided for @productDescriptionHint.
+  /// Hint text for the product description input.
   ///
   /// In en, this message translates to:
   /// **'Description (optional)'**
   String get productDescriptionHint;
 
-  /// No description provided for @save.
+  /// Generic button text to save changes.
   ///
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
 
-  /// No description provided for @cancel.
+  /// Generic button text to cancel an action.
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
 
-  /// No description provided for @nameCannotBeEmpty.
+  /// Error message for when a required name field is empty.
   ///
   /// In en, this message translates to:
   /// **'Name cannot be empty'**
   String get nameCannotBeEmpty;
 
-  /// No description provided for @priceInvalid.
+  /// Error message for invalid price input.
   ///
   /// In en, this message translates to:
   /// **'Please enter a valid price'**
   String get priceInvalid;
 
-  /// No description provided for @editProduct.
+  /// Title or button to edit an existing product.
   ///
   /// In en, this message translates to:
   /// **'Edit Product'**
   String get editProduct;
 
-  /// No description provided for @update.
+  /// Button text to update changes (often used instead of 'Save' for edits).
   ///
   /// In en, this message translates to:
   /// **'Update'**
   String get update;
 
-  /// No description provided for @search.
+  /// Status label for a product that is available.
   ///
   /// In en, this message translates to:
-  /// **'Search'**
-  String get search;
+  /// **'In Stock'**
+  String get inStock;
+
+  /// Status label for a product that is unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of Stock'**
+  String get outOfStock;
+
+  /// Generic loading indicator text.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// Message shown when there are no new orders requiring a quote.
+  ///
+  /// In en, this message translates to:
+  /// **'No new quote requests.'**
+  String get noDraftOrders;
+
+  /// Button text to accept a new order request.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get acceptOrder;
+
+  /// Button text to reject a new order request.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get rejectOrder;
+
+  /// Section or filter for orders that need a quote/review.
+  ///
+  /// In en, this message translates to:
+  /// **'New Requests'**
+  String get draftOrders;
+
+  /// Section or filter for orders that have been accepted and are ready for preparation.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed Orders'**
+  String get confirmedOrders;
+
+  /// Button to change the status of a confirmed order to 'Ready for Pickup/Delivery'.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Ready'**
+  String get orderReady;
+
+  /// Message shown when there are no confirmed orders.
+  ///
+  /// In en, this message translates to:
+  /// **'No confirmed orders to prepare.'**
+  String get noConfirmedOrders;
+
+  /// Title for the screen where the partner submits an order quote.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote for Order'**
+  String get quoteForOrder;
+
+  /// Section title listing the items within an order.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Items'**
+  String get orderItems;
+
+  /// Label for the unit price of an item.
+  ///
+  /// In en, this message translates to:
+  /// **'Price/Unit'**
+  String get pricePerUnit;
+
+  /// Action button to finalize item prices and submit the quote.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Price & Quote'**
+  String get setPrice;
+
+  /// Label for the availability status of an order item.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get itemStatus;
+
+  /// Status label indicating an item is currently available in stock.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
+
+  /// Generic noun for an order.
+  ///
+  /// In en, this message translates to:
+  /// **'Order'**
+  String get order;
+
+  /// Status label for an order or item that requires the partner to provide a price quote.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs Quote'**
+  String get needsQuote;
+
+  /// extra notes about the order
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// Confirm on quoted items
+  ///
+  /// In en, this message translates to:
+  /// **'Quote Confirm'**
+  String get confirmQuote;
+
+  /// Price of the product
+  ///
+  /// In en, this message translates to:
+  /// **'Product Price'**
+  String get productPrice;
+
+  /// Description of the product
+  ///
+  /// In en, this message translates to:
+  /// **'Product Description'**
+  String get productDescription;
+
+  /// Brand of the product
+  ///
+  /// In en, this message translates to:
+  /// **'Product Brand'**
+  String get productBrand;
+
+  /// Missing product price error message
+  ///
+  /// In en, this message translates to:
+  /// **'Product price is required'**
+  String get productPriceRequired;
+
+  /// Missing product description error message
+  ///
+  /// In en, this message translates to:
+  /// **'Product description is required'**
+  String get productDescriptionRequired;
+
+  /// Missing product brand error message
+  ///
+  /// In en, this message translates to:
+  /// **'Product brand is required'**
+  String get productBrandRequired;
+
+  /// Invalide product price error message
+  ///
+  /// In en, this message translates to:
+  /// **'Product price is invalid'**
+  String get productPriceInvalid;
+
+  /// Delete button message
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
 }
 
 class _AppLocalizationsDelegate

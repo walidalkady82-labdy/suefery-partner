@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/errors/authentication_exception.dart';
+import '../enums/auth_status.dart';
+import '../enums/partner_status.dart';
 import '../models/user_model.dart';
 import '../repositories/i_repo_auth.dart';
+import '../repositories/i_repo_firestore.dart';
 import 'logging_service.dart';
 import 'pref_service.dart';
 
@@ -12,17 +15,23 @@ import 'pref_service.dart';
 /// This service coordinates the [IRepoAuth] (for data access)
 /// and the [PrefService] (for session persistence) to perform
 /// sign-in, sign-out, and session management tasks.
-class AuthService {
+class AuthService{
   final IRepoAuth _authRepository;
   final PrefService _prefRepo;
+  final IRepoFirestore _firestoreRepo;
+  Timer? _keepAliveTimer; // NEW: Timer for S3 Keep-Alive
   final _log = LoggerRepo('AuthService'); // Assuming LoggerRepo exists
 
   /// {@macro authentication_service}
   ///
   /// Requires an [IRepoAuth] and [PrefService] for its
   /// dependencies (this is called Dependency Injection).
-  AuthService(this._authRepository, this._prefRepo);
-
+  AuthService(this._authRepository,this._firestoreRepo, this._prefRepo);
+  User? get currentFirebaseUser {
+    final firebaseUser = _authRepository.currentUser;
+    if (firebaseUser == null) return null;
+    return firebaseUser;
+  }
   /// Gets the current [UserModel] by mapping the repository's [User].
   /// Returns `null` if no user is signed in.
   UserModel? get currentAppUser {
@@ -35,46 +44,56 @@ class AuthService {
   ///
   /// This maps the repository's Firebase [User?] stream to your
   /// app's internal [AppUser?] model.
-  Stream<UserModel?> get authStateChanges {
-    return _authRepository.authStateChanges.map((firebaseUser) {
-      if (firebaseUser == null) return null;
-      // You could also fetch user data from Firestore here
-      return UserModel.fromFirebaseUser(firebaseUser);
+  Stream<AuthStatus> onAuthStatusChanged() {
+    return _authRepository.authStateChanges.map((User? user) {
+      if (user != null) {
+        // --- S3 (Keep-Alive) LOGIC START ---
+        // User is logged in, start the keep-alive timer
+        startKeepAlive(user.uid);
+        // --- S3 LOGIC END ---
+        return AuthStatus.authenticated;
+      } else {
+        // --- S3 (Keep-Alive) LOGIC START ---
+        // User is logged out, stop the timer
+        stopKeepAlive();
+        // --- S3 LOGIC END ---
+        return AuthStatus.unauthenticated;
+      }
     });
   }
-    // Refactor ActionCodeSettings into a reusable getter
-  // ActionCodeSettings get _defaultActionCodeSettings {
-  //   final userEmail = currentAppUser?.email;
-  //   return ActionCodeSettings(
-  //     url: "http://www.suefery.com/verify?email=$userEmail",
-  //     iOSBundleId: "com.walidKSoft.suefery",
-  //     androidPackageName: "com.walidKSoft.suefery",
-  //   );
-  // }
+   // --- NEW: S3 (Keep-Alive) HELPER METHODS ---
+  void startKeepAlive(String partnerId) {
+    _keepAliveTimer?.cancel(); // Cancel any existing timer
+    _keepAliveTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
+      _updateKeepAlive(partnerId);
+    });
+    // Send one ping immediately on login
+    _updateKeepAlive(partnerId);
+  }
+
+  void stopKeepAlive() {
+    _keepAliveTimer?.cancel();
+  }
+
+  /// NEW: Pings Firestore to update 'last_seen' and 'status'
+  Future<void> _updateKeepAlive(String partnerId) async {
+    try {
+      await _firestoreRepo.updateDocument(
+        'partners',
+        partnerId,
+        {
+          'status': PartnerStatus.active.name,
+          'last_seen': DateTime.now().toIso8601String(),
+        },
+      );
+      _log.i('Keep-Alive Ping: Partner $partnerId is online.');
+    } catch (e) {
+      _log.e('Failed to update keep-alive: $e');
+    }
+  }
   
-  
-  // Future<void> _handleAuth(String? initialAuthToken) async {
-  //   try {
-  //     initialAuthToken ??= "";
-  //     if (initialAuthToken.isNotEmpty) {
-  //       // Use custom token provided by the canvas environment
-  //       final userCredential = await _auth.signInWithCustomToken(initialAuthToken);
-  //       _currentUserId = userCredential.user!.uid;
-  //       _log.i('Signed in with Custom Token. UID: $_currentUserId');
-  //     } else {
-  //       // Fallback to anonymous sign-in if no token is provided
-  //       final userCredential = await _auth.signInAnonymously();
-  //       _currentUserId = userCredential.user!.uid;
-  //       _log.i('Signed in Anonymously. UID: $_currentUserId');
-  //     }
-  //   } catch (e) {
-  //     _log.e('ERROR: Firebase Auth failed: $e');
-  //     // Use a random ID if sign-in completely fails (to maintain operation)
-  //     _currentUserId = 'anonymous-${DateTime.now().millisecondsSinceEpoch}';
-  //   }
-  // }
-  /// Reloads the user's data from the provider.
-  Future<void> reloadUser() => _authRepository.reloadUser();
+  // --- END S3 HELPER METHODS ---
+
 
   /// Handles the business logic for Google Sign-In.
   Future<UserModel?> signInWithGoogle() async {
@@ -114,7 +133,12 @@ class AuthService {
         return UserModel.fromFirebaseUser(user);
       }
       return null;
-    } catch (e) {
+    } 
+    on FirebaseAuthException catch (e) {
+      _log.e("Registration Error: $e");
+      throw AuthenticationFailure(e.message ?? 'Sign-in failed');
+    }
+    catch (e) {
       _log.e("Registration Error: $e");
       rethrow;
     }
@@ -147,7 +171,6 @@ class AuthService {
       throw LoginEmailPassFirebaseFailure('Login timed out. Please check your network connection and try again.');
     } on FirebaseAuthException catch (e) {
       _log.e("Login Error: ${e.code} , ${e.message}");
-      // --- FIX: Handle 'invalid-credential' specifically ---
       // This error often means the user signed up with a different provider (e.g., Google).
       if (e.code == 'invalid-credential') {
         throw LoginEmailPassFirebaseFailure(
@@ -178,7 +201,7 @@ class AuthService {
 
   /// Checks if the user's session is still valid on app start.
   Future<bool> isUserLoggedIn() async {
-    final bool isUserLoggedin = await _prefRepo.isUserLoggedin;
+    final bool isUserLoggedin = _prefRepo.isUserLoggedin;
     final bool hasAuthUser = _authRepository.currentUser != null;
 
     if (!isUserLoggedin || !hasAuthUser) {
@@ -249,7 +272,11 @@ class AuthService {
   Future<void> sendEmailVerification() async {
     try {
       await _authRepository.sendEmailVerification();
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
+      _log.e("Registration Error: $e");
+      throw AuthenticationFailure(e.message ?? 'send verification email failed');
+    }
+    catch (e) {
       _log.e('Error sending verification email: $e');
       rethrow;
     }
@@ -306,6 +333,14 @@ class AuthService {
       _log.i('User re-authenticated successfully with Google.'); 
     } catch (e) {
       _log.e('Error during Google re-authentication: $e');
+      rethrow;
+    }
+  }
+  Future<void> reloadUser() async {
+    try {
+      await _authRepository.reloadUser();
+    }catch (e) {
+      _log.e('Error during reloading user: $e');
       rethrow;
     }
   }

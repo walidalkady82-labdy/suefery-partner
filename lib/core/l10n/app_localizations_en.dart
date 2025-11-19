@@ -27,33 +27,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noNewOrders => 'No new orders at the moment.';
 
   @override
-  String get acceptOrder => 'Accept';
+  String get submitQuote => 'Submit Quote to Customer';
 
   @override
-  String get rejectOrder => 'Reject';
+  String get totalQuote => 'New Total';
 
   @override
-  String get orderReady => 'Mark as Ready';
+  String get welcome => 'Welcome, Partner';
 
   @override
-  String get inStock => 'In Stock';
+  String get email => 'Email';
 
   @override
-  String get outOfStock => 'Out of Stock';
+  String get password => 'Password';
 
   @override
-  String get welcome => 'Welcome!';
+  String get login => 'Login';
+
+  @override
+  String get logout => 'Logout';
 
   @override
   String get loadingInventory => 'Loading inventory...';
 
   @override
-  String orderNumber(Object orderId) {
+  String orderNumber(String orderId) {
     return 'Order #$orderId';
   }
 
   @override
-  String totalPrice(Object currency, Object total) {
+  String totalPrice(double total, String currency) {
     return 'Total: $total $currency';
   }
 
@@ -89,7 +92,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changeLanguage => 'Change Language';
 
   @override
-  String currentLanguage(Object languageCode) {
+  String currentLanguage(String languageCode) {
     return 'Current: $languageCode';
   }
 
@@ -149,7 +152,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orSignInWith => 'Or sign in with';
 
   @override
-  String get verificationNeeded => 'Vreification is needed to continue';
+  String get verificationNeeded => 'Verification is needed to continue';
 
   @override
   String get checkStatusButton => 'Check Status';
@@ -176,9 +179,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addProduct => 'Add Product';
 
   @override
-  String get productNameHint => 'Product Name';
-
-  @override
   String get productPriceHint => 'Price';
 
   @override
@@ -203,5 +203,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String get update => 'Update';
 
   @override
-  String get search => 'Search';
+  String get inStock => 'In Stock';
+
+  @override
+  String get outOfStock => 'Out of Stock';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get noDraftOrders => 'No new quote requests.';
+
+  @override
+  String get acceptOrder => 'Accept';
+
+  @override
+  String get rejectOrder => 'Reject';
+
+  @override
+  String get draftOrders => 'New Requests';
+
+  @override
+  String get confirmedOrders => 'Confirmed Orders';
+
+  @override
+  String get orderReady => 'Mark as Ready';
+
+  @override
+  String get noConfirmedOrders => 'No confirmed orders to prepare.';
+
+  @override
+  String get quoteForOrder => 'Quote for Order';
+
+  @override
+  String get orderItems => 'Order Items';
+
+  @override
+  String get pricePerUnit => 'Price/Unit';
+
+  @override
+  String get setPrice => 'Set Price & Quote';
+
+  @override
+  String get itemStatus => 'Status';
+
+  @override
+  String get available => 'Available';
+
+  @override
+  String get order => 'Order';
+
+  @override
+  String get needsQuote => 'Needs Quote';
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get confirmQuote => 'Quote Confirm';
+
+  @override
+  String get productPrice => 'Product Price';
+
+  @override
+  String get productDescription => 'Product Description';
+
+  @override
+  String get productBrand => 'Product Brand';
+
+  @override
+  String get productPriceRequired => 'Product price is required';
+
+  @override
+  String get productDescriptionRequired => 'Product description is required';
+
+  @override
+  String get productBrandRequired => 'Product brand is required';
+
+  @override
+  String get productPriceInvalid => 'Product price is invalid';
+
+  @override
+  String get delete => 'Delete';
 }

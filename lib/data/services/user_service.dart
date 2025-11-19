@@ -1,5 +1,6 @@
 import 'package:suefery_partner/data/models/user_model.dart';
 
+import '../enums/partner_status.dart';
 import '../repositories/i_repo_firestore.dart'; // Assuming you have this model
 
 class UserService {
@@ -18,6 +19,19 @@ class UserService {
       }
       // Business Logic: Handles data conversion
       return UserModel.fromMap(snapshot.data()!);
+    });
+  }
+
+  Stream<PartnerStatus> getPartnerStatusStream(String userId) {
+    return _firestoreRepo
+        .getDocumentStream(_collectionPath, userId) 
+        .map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        final data = snapshot.data()!;
+        // Returns the status from Firestore, defaulting to offline if missing
+        return PartnerStatusExtension.fromString(data['status'] ?? 'offline');
+      }
+      return PartnerStatus.inactive;
     });
   }
 
@@ -43,13 +57,16 @@ class UserService {
   }
 
   /// Updates specific fields for a user.
-  Future<void> updateUser(String userId, {String? name, String? email}) {
+  Future<void> updateUser(String userId, {String? name, String? email , String? fcmToken}) {
     final dataToUpdate = <String, dynamic>{};
     if (name != null) {
       dataToUpdate['name'] = name;
     }
     if (email != null) {
       dataToUpdate['email'] = email;
+    }
+     if (fcmToken != null) {
+      dataToUpdate['fcmToken'] = fcmToken;
     }
     return _firestoreRepo.updateDocument(_collectionPath, userId, dataToUpdate);
   }
@@ -58,4 +75,5 @@ class UserService {
   Future<void> deleteUser(String userId) {
     return _firestoreRepo.remove(_collectionPath, userId);
   }
+
 }

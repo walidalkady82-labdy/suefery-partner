@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:suefery_partner/core/extensions/future_extension.dart';
-import 'package:suefery_partner/data/enums/query_operator.dart';
 
 
 import 'i_repo_firestore.dart';

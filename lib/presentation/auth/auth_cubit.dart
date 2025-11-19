@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:suefery_partner/data/enums/auth_status.dart';
@@ -6,7 +7,8 @@ import 'package:suefery_partner/data/models/user_model.dart';
 import 'package:suefery_partner/data/services/auth_service.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 import 'package:suefery_partner/locator.dart';
-import 'package:suefery_partner/presentation/home/home_screen.dart';
+import '../../data/enums/user_role.dart';
+import '../../data/services/user_service.dart';
 
 final _log = LoggerRepo('LoginState');
 
@@ -63,21 +65,87 @@ class AuthState {
 }
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(AuthState()) {
-          authSubscription = _authService.authStateChanges.listen(_onAuthStateChanged);
-        }
+
   final AuthService _authService = sl<AuthService>();
+  late StreamSubscription<AuthStatus> _authStatusSubscription;
+
   late final StreamSubscription<UserModel?> authSubscription;
+  User? get currentFirebaseUser => _authService.currentFirebaseUser;
+  UserModel? get currentDbUser => _authService.currentAppUser;
 
-  UserModel? get currentUser => _authService.currentAppUser;
+  AuthCubit() : super(AuthState()) {
+      _authStatusSubscription =
+          _authService.onAuthStatusChanged().listen((authStatus) async {
+        if (authStatus == AuthStatus.authenticated) {
+          await _checkUserRole();
+        } else {
+          emit(state.copyWith(
+              authState: authStatus,
+              user: _authService.currentAppUser,
+            ),
+          );
+        }
+      });
+    }
 
-  void _onAuthStateChanged(UserModel? user) {
-    if (user != null) {
-      emit(state.copyWith(authState: AuthStatus.authenticated, user: user));
-    } else {
-      emit(state.copyWith(authState: AuthStatus.authenticated, user: null));
+  Future<void> _checkUserRole() async {
+    emit(state.copyWith(
+      isLoading: true,
+      errorMessage: '',
+    ));
+    if (currentFirebaseUser == null) {
+      emit(
+        state.copyWith(
+          isLoading: false,
+          errorMessage: 'User not found. Please contact support.',
+        ),
+      );
+      return;
+    }
+
+    try {
+      if (currentDbUser != null) {
+        if (currentDbUser?.role == UserRole.partner) {
+          emit(
+            state.copyWith(
+              isLoading: false,
+              authState: AuthStatus.authenticated,
+              user: currentDbUser,
+            )
+          );
+        } else {
+          // Not a partner, log them out
+          await _authService.logOut();
+          emit(
+            state.copyWith(
+            isLoading: false,
+            errorMessage: 'This app is for partners only.'
+          ));
+        }
+      } else {
+        // User document doesn't exist, log them out
+        await _authService.logOut();
+        emit(state.copyWith(
+            isLoading: false,
+            errorMessage: 'User not found. Please contact support.'
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+            isLoading: false,
+            errorMessage:
+        e.toString()
+      ));
     }
   }
+
+  // void _onAuthStateChanged(UserModel? user) {
+  //   if (user != null) {
+  //     emit(state.copyWith(authState: AuthStatus.authenticated, user: user));
+  //   } else {
+  //     emit(state.copyWith(authState: AuthStatus.authenticated, user: null));
+  //   }
+  //}
 
   void updateLoadingState(bool loadingState){
     emit(state.copyWith(isLoading: loadingState));
@@ -158,6 +226,35 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> signUp() async{
+    final formState = state;
+    if (formState.password != formState.confirmPassword) {
+      emit(formState.copyWith(errorMessage: 'Passwords do not match.'));
+      return; 
+    }
+    if (formState.password.length < 6) {
+      emit(formState.copyWith(errorMessage: 'Password must be at least 6 characters.'));
+      return;
+    }
+
+    emit(formState.copyWith(isLoading: true, errorMessage: ''));
+    try {
+      await _authService.signUpWithEmailAndPassword(
+        email: formState.email.trim(),
+        password: formState.password,
+      );
+      // On success, the auth state stream will handle navigation.
+    } catch (e) {
+      final errorMessage = e.toString();
+      _log.e('Sign Up Failed: $errorMessage');
+      emit(state.copyWith(errorMessage: errorMessage));
+    } finally {
+      if (state.authState== AuthStatus.unauthenticated) {
+        emit(state.copyWith(isLoading: false));
+      }
+    }
+}
+
   Future<void> signOut() async {
     try {
       await _authService.logOut();
@@ -202,34 +299,13 @@ class AuthCubit extends Cubit<AuthState> {
       _log.e(errorMessage);
     }
   }
-  //TODO check errors message to integrate with strings
-  Future<void> signUp() async{
-    final formState = state;
-    if (formState.password != formState.confirmPassword) {
-      emit(formState.copyWith(errorMessage: 'Passwords do not match.'));
-      return; 
-    }
-    if (formState.password.length < 6) {
-      emit(formState.copyWith(errorMessage: 'Password must be at least 6 characters.'));
-      return;
-    }
-
-    emit(formState.copyWith(isLoading: true, errorMessage: ''));
-    try {
-      await _authService.signUpWithEmailAndPassword(
-        email: formState.email.trim(),
-        password: formState.password,
-      );
-      // On success, the auth state stream will handle navigation.
-    } catch (e) {
-      final errorMessage = e.toString();
-      _log.e('Sign Up Failed: $errorMessage');
-      emit(state.copyWith(errorMessage: errorMessage));
-    } finally {
-      if (state.authState== AuthStatus.unauthenticated) {
-        emit(state.copyWith(isLoading: false));
-      }
-    }
-}
+  
+  @override
+  Future<void> close() {
+    _authStatusSubscription.cancel();
+    // NEW: Stop the keep-alive timer on Cubit close
+    _authService.stopKeepAlive();
+    return super.close();
+  }
 
 }

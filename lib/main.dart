@@ -10,12 +10,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:suefery_partner/core/l10n/app_localizations.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 import 'package:suefery_partner/locator.dart';
-import 'package:suefery_partner/presentation/home/home_cubit.dart';
+import 'package:suefery_partner/presentation/auth/auth_cubit.dart';
+import 'package:suefery_partner/presentation/home/order_cubit.dart';
 
 import 'firebase_options.dart';
 import 'presentation/auth/auth_checker.dart';
-import 'presentation/auth/auth_cubit.dart';
-import 'presentation/auth/auth_wrapper.dart';
 import 'presentation/settings/settings_cubit.dart';
 
 
@@ -25,30 +24,7 @@ Future<void> main() async {
   _log.i('initializing app...');
   WidgetsFlutterBinding.ensureInitialized();
   _log.i('Loading app...');
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        // GLOBAL CUBITS (Available to ALL screens/features)
-        BlocProvider(
-          create: (context) => AuthCubit(),
-        ),
-        BlocProvider(
-          // SettingsCubit loads its own initial state from PrefService
-          create: (context) => SettingsCubit()..loadSettings(),
-        ),
-        // BlocProvider(
-        //   // GeminiCubit depends on GeminiService
-        //   create: (context) => HomeCubit(),
-        // ),
-        // BlocProvider(
-        //   // GeminiCubit depends on GeminiService
-        //   create: (context) => OrderHistoryCubit(),
-        // ),
-        // FEATURE CUBITS (Can be added here or on specific routes)
-        // BlocProvider(create: (_) => BookingCubit()),
-      ],
-      child: const AppContainer(child:SuefereyPartnerApp() ),
-    )
+  runApp(const AppContainer(child:SuefereyPartnerApp())
   );
   _log.i('App initialized...');
 }
@@ -284,8 +260,8 @@ class SuefereyPartnerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {    
     return BlocProvider(
-            create: (context) => HomeCubit(),
-            child: BlocBuilder<HomeCubit, HomeState>(
+            create: (context) => OrderCubit(),
+            child: BlocBuilder<OrderCubit, OrderState>(
               builder: (context, homeState) {
                 return MaterialApp(
                   onGenerateTitle: (ctx) => AppLocalizations.of(ctx)!.appTitle,          
@@ -307,7 +283,9 @@ class SuefereyPartnerApp extends StatelessWidget {
                   locale: context.read<SettingsCubit>().state.locale, // Use the locale from the SettingsCubit
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
-                  home: AuthChecker(),
+                  home:  BlocProvider(
+                            create: (ctx) => AuthCubit(),
+                          ),
                 );
               },
             ),

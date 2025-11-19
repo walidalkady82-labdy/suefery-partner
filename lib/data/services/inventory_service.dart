@@ -10,6 +10,15 @@ class InventoryService {
 
   InventoryService(this._firestoreRepo);
 
+  /// Fetches the live list of products for a specific store
+  Stream<List<ProductModel>> getProductsStream(String storeId) {
+    return  _firestoreRepo.getCollectionStream( _collectionPath,
+        where: [QueryCondition('storeId', isEqualTo: storeId)],
+        orderBy: [OrderBy('name')]).map((snapshot) => snapshot.docs
+            .map((doc) => ProductModel.fromMap(doc.data()))
+            .toList());
+  }
+
   /// Fetches the inventory (list of products) for a specific partner.
   Future<List<ProductModel>> fetchInventory(String partnerId) async {
     _log.i('Fetching inventory for partner: $partnerId');
@@ -37,8 +46,8 @@ class InventoryService {
 
   /// Updates an entire product document in the inventory.
   Future<void> updateProduct(ProductModel product) async {
-    _log.i('Updating product: ${product.productId}');
-    await _firestoreRepo.updateDocument(_collectionPath, product.productId, product.toMap());
+    _log.i('Updating product: ${product.id}');
+    await _firestoreRepo.updateDocument(_collectionPath, product.id, product.toMap());
   }
 
   /// Removes a product from the inventory using its ID.

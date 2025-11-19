@@ -53,6 +53,7 @@ Future<void> initLocator(FirebaseApp firebaseApp) async {
   // Auth Service
   sl.registerLazySingleton<AuthService>(() => AuthService(
         sl<IRepoAuth>(),
+        sl<RepoFirestore>(),
         sl<PrefService>(),
       ));
 

@@ -43,11 +43,11 @@ class OrderService {
     }
   }
 
-  /// Provides a real-time stream of orders for a specific partner.
+  /// Provides a real-time stream of pending orders for a specific partner.
   ///
   /// [partnerId] The ID of the partner/store to fetch orders for.
   /// Returns a stream of a list of [OrderModel].
-  Stream<List<OrderModel>> getOrdersStream(String partnerId) {
+  Stream<List<OrderModel>> getPendingOrdersStream(String partnerId) {
     if(kDebugMode){
       return Stream.value(MockOrders.allOrders);
     }
@@ -56,7 +56,10 @@ class OrderService {
       return _firestoreRepo
           .getCollectionStream(
         _collectionPath,
-        where: [QueryCondition('partnerId', isEqualTo: partnerId)],
+        where: [
+          QueryCondition('partnerId', isEqualTo: partnerId),
+          QueryCondition('status', isEqualTo: OrderStatus.draft.name)
+        ],
         orderBy: [const OrderBy('createdAt', descending: true)],
       )
           .map((snapshot) {
@@ -69,6 +72,37 @@ class OrderService {
       throw Exception('An error occurred while setting up the order stream.');
     }
   }
+  
+    /// Provides a real-time stream of confirmed orders for a specific partner.
+  ///
+  /// [partnerId] The ID of the partner/store to fetch orders for.
+  /// Returns a stream of a list of [OrderModel].
+  Stream<List<OrderModel>> getConfirmedOrdersStream(String partnerId) {
+    if(kDebugMode){
+      return Stream.value(MockOrders.allOrders);
+    }
+    _log.i('Streaming orders for partner: $partnerId');
+    try {
+      return _firestoreRepo
+          .getCollectionStream(
+        _collectionPath,
+        where: [
+          QueryCondition('partnerId', isEqualTo: partnerId),
+          QueryCondition('status', isEqualTo: OrderStatus.preparing.name)
+        ],
+        orderBy: [const OrderBy('createdAt', descending: true)],
+      )
+          .map((snapshot) {
+        final orders = snapshot.docs.map((doc) => OrderModel.fromMap(doc.data())).toList();
+        _log.i('Stream emitted ${orders.length} orders.');
+        return orders;
+      });
+    } catch (e, stackTrace) {
+      _log.e('Failed to set up order stream', e, stackTrace);
+      throw Exception('An error occurred while setting up the order stream.');
+    }
+  }
+  
   /// Updates the status of a specific order in Firestore.
   ///
   /// [orderId] The ID of the order to update.
@@ -115,47 +149,49 @@ class OrderService {
     }
   }
 
-  Future<void> updateDraftOrderPrices(String orderId, Map<String, double> itemPrices) async {
+    Future<void> updateOrderMap(String id,Map<String,dynamic> orderValues) async {
+    _log.i('Updating order document specified values');
     try {
-      _log.i('Updating draft order $orderId with prices: $itemPrices');
+      await _firestoreRepo.updateDocument(_collectionPath, id, orderValues);
+      _log.i('Successfully updated order document: $id');
+    } catch (e, stackTrace) {
+      _log.e('Failed to update order $id', e, stackTrace);
+      throw Exception('An error occurred while updating the order.');
+    }
+  }
 
-      // 1. Get the draft order.
-      // This assumes you have a getOrder method in your OrderService
-      // If not, you'd fetch it directly from Firestore here:
-      final order = await getOrder(orderId); 
-
-      if (order.status != OrderStatus.draft) {
-        throw Exception('Order is not a draft: $orderId');
-      }
-
-      // 2. Apply price updates and recalculate total.
-      double newTotal = 0.0;
-      final updatedItems = order.items.map((item) {
-        if (itemPrices.containsKey(item.name)) {
-          final newPrice = itemPrices[item.name]!;
-          newTotal += newPrice * item.quantity;
-          return item.copyWith(unitPrice: newPrice);
-        } else {
-          newTotal += item.unitPrice * item.quantity;
-          return item; // Price not updated for this item
-        }
-      }).toList();
-
-      // 3. Create the updated order model.
-      final updatedOrder = order.copyWith(
-        items: updatedItems,
-        total: newTotal,
-        status: OrderStatus.quoteReady, // Or a similar status after price update
-      );
-
-      // 4. Save the updated order back.
-      // This assumes you have an updateOrder method in your OrderService
-      await updateOrder(updatedOrder);
-
-      _log.i('Successfully updated order $orderId with prices.');
+  Future<void> submitQuote(String orderId, List<OrderItemModel> quotedItems, double newTotal) async {
+    try {
+      await _firestoreRepo.updateDocument(_collectionPath, orderId, {
+        'items': quotedItems.map((item) => item.toMap()).toList(),
+        'total': newTotal,
+        'status': OrderStatus.quoteReady.name, // Now waits for customer
+      });
     } catch (e) {
-      _log.e('Error updating draft order $orderId prices: $e');
-      rethrow; // Propagate the error
+      throw Exception('Failed to submit quote: $e');
+    }
+  }
+
+
+  // Future<void> submitQuote(String orderId, List<OrderItemModel> quotedItems, double newTotal) async {
+  //   try {
+  //     _log.i('Submitting quote for order $orderId');
+  //     await _firestoreRepo.updateDocument(_collectionPath, orderId, 
+  //     {
+  //       'items': quotedItems.map((item) => item.toMap()).toList(),
+  //       'total': newTotal,
+  //       'status': OrderStatus.quoteReady.name, // Now waits for customer
+  //     });
+  //   } catch (e) {
+  //     throw Exception('Failed to submit quote: $e');
+  //   }
+  // }
+  Future<void> markOrderReady(String orderId) async {
+    try {
+      await updateOrderMap( orderId,  {'status': OrderStatus.readyForPickup.name,}
+      );
+    } catch (e) {
+      throw Exception('Failed to update order status: $e');
     }
   }
 }
