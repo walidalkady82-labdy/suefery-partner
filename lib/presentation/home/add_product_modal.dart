@@ -62,7 +62,7 @@ class _AddProductModalState extends State<AddProductModal> {
                 }
                 return null;
               },
-              onSaved: (value) => _productDescription = value!,
+              onSaved: (value) => _productBrand = value!,
             ),
             TextFormField(
               decoration: InputDecoration(labelText: strings.productPrice, prefixText: 'EGP '),

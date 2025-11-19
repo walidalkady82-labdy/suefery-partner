@@ -79,6 +79,17 @@ class _EditProductModalState extends State<EditProductModal> {
               onSaved: (value) => _productDescription = value!,
             ),
             TextFormField(
+              initialValue: _productBrand,
+              decoration: InputDecoration(labelText: strings.productBrand),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return strings.productBrandRequired;
+                }
+                return null;
+              },
+              onSaved: (value) => _productBrand = value!,
+            ),
+            TextFormField(
               initialValue: _productPrice.toString(),
               decoration: InputDecoration(labelText: strings.productPrice, prefixText: 'EGP '),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:suefery_partner/core/l10n/app_localizations.dart';
+import 'package:suefery_partner/core/utils/themes.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 import 'package:suefery_partner/locator.dart';
 import 'package:suefery_partner/presentation/auth/auth_checker.dart';
@@ -272,19 +273,8 @@ class SuefereyPartnerApp extends StatelessWidget {
                 final settings = context.read<SettingsCubit>();
                 return MaterialApp(
                   onGenerateTitle: (ctx) => AppLocalizations.of(ctx)?.appTitle ?? 'Suefery Partner',
-                  theme: settings.state.appTheme.themeData,
-                  darkTheme: ThemeData(
-                    brightness: Brightness.dark,
-                    primaryColor: const Color(0xFF00796B),
-                    fontFamily: 'Cairo',
-                    colorScheme: ColorScheme.fromSwatch(
-                      primarySwatch: Colors.teal,
-                      brightness: Brightness.dark,
-                    ).copyWith(
-                      secondary: const Color(0xFFFFA000),
-                    ),
-                    useMaterial3: true,
-                  ),
+                  theme: lightTheme, // Always use the defined light theme
+                  darkTheme: darkTheme, // Always use the defined dark theme
                   themeMode: settings.state.themeMode, // Use the themeMode from the SettingsCubit
                   locale: settings.state.locale, // Use the locale from the SettingsCubit
                   localizationsDelegates: AppLocalizations.localizationsDelegates,

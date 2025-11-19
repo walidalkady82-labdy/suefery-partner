@@ -36,20 +36,20 @@ class SettingsScreen extends StatelessWidget {
             SwitchListTile(
               title: Text(strings.darkMode),
               value: state.themeMode == ThemeMode.dark,
-              onChanged: (isDark) => settingsCubit.toggleDarkMode(isDark),
+              onChanged: (isDark) => settingsCubit.toggleTheme(),
               secondary: const Icon(Icons.dark_mode_outlined),
             ),
-            // Assuming AppTheme is an enum you have defined elsewhere
-            // You can map over its values to create the radio buttons
-            ...AppTheme.values.map((theme) {
-              return RadioListTile<AppTheme>(
-                value: theme,
-                groupValue: state.appTheme,
-                onChanged: (newTheme) => settingsCubit.changeTheme(newTheme!),
-                title: Text(theme.name), // You can create a getter for a more user-friendly name
-                subtitle: Text('A theme description'), // Add to localizations
-              );
-            }),
+            // // Assuming AppTheme is an enum you have defined elsewhere
+            // // You can map over its values to create the radio buttons
+            // ...AppTheme.values.map((theme) {
+            //   return RadioListTile<AppTheme>(
+            //     value: theme,
+            //     groupValue: state.appTheme,
+            //     onChanged: (newTheme) => settingsCubit.changeTheme(newTheme!),
+            //     title: Text(theme.name), // You can create a getter for a more user-friendly name
+            //     subtitle: Text('A theme description'), // Add to localizations
+            //   );
+            // }),
           ],
         ),
       );
