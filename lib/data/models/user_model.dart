@@ -12,22 +12,22 @@ class UserModel extends Equatable {
   final String? phone;
   final String firstName;
   final String lastName;
-  final String address;
-  final String city;
-  final String country;
-  final String postalCode;
-  final String state;
-  final String specificPersonaGoal;
+  final String? address;
+  final String? city;
+  final String? country;
+  final String? postalCode;
+  final String? state;
+  final String? specificPersonaGoal;
   final bool isVerified;
   final DateTime? creationTimestamp;
   final String? photoUrl;
-  final List<String> tags;
+  final List<String>? tags;
   final String? bio;
   final String? website;
   final PartnerStatus partnerStatus;
-  final Map<String , double> location ;
-  final String geohash;
-  final String storeId; 
+  final Map<String , double>? location ;
+  final String? geohash;
+  final String? storeId; 
   final String? fcmToken;
 
   const UserModel({
@@ -99,13 +99,13 @@ class UserModel extends Equatable {
       phone: map['phone'] as String?,
       firstName: map['firstName'] as String,
       lastName: map['lastName'] as String,
-      address: map['address'] as String,
-      city: map['city'] as String,
-      country: map['country'] as String,
-      postalCode: map['postalCode'] as String,
-      state: map['state'] as String,
-      specificPersonaGoal: map['specificPersonaGoal'] as String,
-      isVerified: map['isVerified'] as bool,
+      address: map['address'] as String?,
+      city: map['city'] as String?,
+      country: map['country'] as String?,
+      postalCode: map['postalCode'] as String?,
+      state: map['state'] as String?,
+      specificPersonaGoal: map['specificPersonaGoal'] as String?,
+      isVerified: map['isVerified']!=null ? map['isVerified']as bool:false,
       creationTimestamp: (map['creationTimestamp'] as Timestamp?)?.toDate(),
       photoUrl: map['photoUrl'] as String?,
       tags: (map['tags'] as List<dynamic>?)?.cast<String>() ?? [],
@@ -113,9 +113,9 @@ class UserModel extends Equatable {
       website: map['website'] as String?,
       partnerStatus: PartnerStatus.values
           .firstWhere((e) => e.name == map['status'], orElse: () => PartnerStatus.inactive),
-      location: map['location'] as Map<String, double>,
-      geohash: map['geohash'] as String,
-      storeId: map['storeId'] as String,
+      location: map['location'] as Map<String, double>?,
+      geohash: map['geohash'] as String?,
+      storeId: map['storeId'] as String?,
       fcmToken: map['fcmToken'] as String?,
     );
   }

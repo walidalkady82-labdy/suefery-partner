@@ -23,7 +23,7 @@ class HomeScreen extends StatelessWidget {
       providers: [
         // Initialize data immediately
         BlocProvider(create: (_) => OrderCubit()), 
-        BlocProvider(create: (_) => InventoryCubit()..fetchInventory(auth.currentAppUser!.storeId)),
+        BlocProvider(create: (_) => InventoryCubit()..fetchInventory(auth.currentAppUser!.storeId!)),
       ],
       // 2. DefaultTabController manages the state for us
       child: DefaultTabController(
@@ -92,7 +92,7 @@ class OrderManagementTab extends StatelessWidget {
         }
 
         return RefreshIndicator(
-          onRefresh: () async => context.read<OrderCubit>().loadOrders(auth.currentAppUser!.storeId),
+          onRefresh: () async => context.read<OrderCubit>().loadOrders(auth.currentAppUser!.storeId!),
           child: ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
@@ -233,7 +233,7 @@ class InventoryManagementTab extends StatelessWidget {
           }
           
           return RefreshIndicator(
-            onRefresh: () async => context.read<InventoryCubit>().fetchInventory(auth.currentAppUser!.storeId),
+            onRefresh: () async => context.read<InventoryCubit>().fetchInventory(auth.currentAppUser!.storeId!),
             child: ListView.builder(
               padding: const EdgeInsets.all(16.0),
               itemCount: state.products.length,

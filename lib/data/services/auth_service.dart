@@ -139,6 +139,7 @@ class AuthService{
       if (user != null) {
         await _prefRepo.setIsFirstLogin(true);
         final partnerMap = {
+          'id': user.uid,
           'uid': user.uid,
           'email': email,
           'firstName': firstName,

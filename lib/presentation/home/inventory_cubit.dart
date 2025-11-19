@@ -61,7 +61,7 @@ class InventoryCubit extends Cubit<InventoryState> {
       await _inventoryService.addProduct(
         ProductModel(
           id: '', 
-          storeId: _authService.currentAppUser!.storeId, 
+          storeId: _authService.currentAppUser!.storeId!, 
           description: description, 
           brand: brand,
           price: price,
