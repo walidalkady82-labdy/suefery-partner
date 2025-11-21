@@ -158,7 +158,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkStatusButton => 'Check Status';
 
   @override
-  String get toSignup => 'To Signup';
+  String get toSignup => 'Don\'t have an account? Sign Up';
 
   @override
   String get toLogin => 'To Login';
@@ -354,4 +354,108 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountHint => 'Please type DELETE to confirm.';
+
+  @override
+  String get setupStoreScreenTitle => 'Setup Your Store';
+
+  @override
+  String get setupStoreMainMessage => 'One Last Step!';
+
+  @override
+  String get setupStoreMain1Message =>
+      'We need your store details to connect you with customers nearby.';
+
+  @override
+  String get storeNameLabel => 'Store Name';
+
+  @override
+  String get setupTitle => 'Setup Your Store';
+
+  @override
+  String get stepInfo => 'Info';
+
+  @override
+  String get stepLocation => 'Location';
+
+  @override
+  String get stepTags => 'Tags';
+
+  @override
+  String get oneLastStep => 'One Last Step!';
+
+  @override
+  String get setupSubtitle =>
+      'We need your store details to connect you with customers nearby.';
+
+  @override
+  String get storeName => 'Store Name';
+
+  @override
+  String get bioLabel => 'Bio / Slogan';
+
+  @override
+  String get websiteLabel => 'Website (Optional)';
+
+  @override
+  String get coordsLabel => 'Coordinates (Lat/Lng)';
+
+  @override
+  String get coordTip => 'Tip: Use Google Maps to find your exact coordinates.';
+
+  @override
+  String get tagsTitle => 'What do you sell?';
+
+  @override
+  String get tagsSubtitle => 'e.g., Grocery, Pharmacy, Snacks';
+
+  @override
+  String get addTagHint => 'Add a tag...';
+
+  @override
+  String get noTags => 'No tags added yet.';
+
+  @override
+  String get completeSetup => 'Complete Setup';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get revenueThisMonth => 'Revenue (Month)';
+
+  @override
+  String get totalOrders => 'Total Orders';
+
+  @override
+  String get mostWantedItems => 'Most Wanted Items';
+
+  @override
+  String get noDataYet => 'No data available yet.';
+
+  @override
+  String get partnerPerformance => 'Partner Score';
+
+  @override
+  String get statusExcellent => 'Excellent';
+
+  @override
+  String get statusGood => 'Good';
+
+  @override
+  String get statusAtRisk => 'At Risk';
+
+  @override
+  String get fulfillmentRate => 'Fulfillment Rate';
+
+  @override
+  String get keepItUp => 'High fulfillment boosts your ranking in S3 Dispatch.';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get tabAnalysis => 'Analysis';
 }

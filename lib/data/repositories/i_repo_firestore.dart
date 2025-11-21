@@ -39,7 +39,7 @@ class OrderBy {
 /// This allows for easy mocking and swapping of Firestore implementations.
 abstract class IRepoFirestore {
 
-  String generateId(String path) ;
+  Future<String> generateId(String path,{String? id}) ;
 
   /// Fetches a collection of documents from Firestore.
   ///

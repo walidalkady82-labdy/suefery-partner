@@ -210,7 +210,7 @@
   "@checkStatusButton": {
     "description": "Button to check the current status of the account/verification."
   },
-  "toSignup": "To Signup",
+  "toSignup": "Don't have an account? Sign Up",
   "@toSignup": {
     "description": "Generic navigation text to the signup page."
   },
@@ -470,6 +470,50 @@
   "@displayName": { "description": "Display name label"},
 
   "deleteAccountHint" : "Please type DELETE to confirm.",
-  "@deleteAccountHint": { "description": "Display delete account hint"}
+  "@deleteAccountHint": { "description": "Display delete account hint"},
+  
+  "setupStoreScreenTitle" : "Setup Your Store",
+  "@setupStoreScreenTitle": { "description": "Display title of setup store screen"},
 
+  "setupStoreMainMessage" : "One Last Step!",
+  "@setupStoreMainMessage": { "description": "Display message of setup store screen"},
+
+  "setupStoreMain1Message" : "We need your store details to connect you with customers nearby.",
+  "@setupStoreMain1Message": { "description": "Display message of setup store screen"},  
+
+  "storeNameLabel" : "Store Name",
+  "@storeNameLabel": { "description": "Display label of store name"},
+
+  
+    "setupTitle": "Setup Your Store",
+    "stepInfo": "Info",
+    "stepLocation": "Location",
+    "stepTags": "Tags",
+    "oneLastStep": "One Last Step!",
+    "setupSubtitle": "We need your store details to connect you with customers nearby.",
+    "storeName": "Store Name",
+    "bioLabel": "Bio / Slogan",
+    "websiteLabel": "Website (Optional)",
+    "coordsLabel": "Coordinates (Lat/Lng)",
+    "coordTip": "Tip: Use Google Maps to find your exact coordinates.",
+    "tagsTitle": "What do you sell?",
+    "tagsSubtitle": "e.g., Grocery, Pharmacy, Snacks",
+    "addTagHint": "Add a tag...",
+    "noTags": "No tags added yet.",
+    "completeSetup": "Complete Setup",
+    "next": "Next",
+    "back": "Back",
+    "revenueThisMonth": "Revenue (Month)",
+    "totalOrders": "Total Orders",
+    "mostWantedItems": "Most Wanted Items",
+    "noDataYet": "No data available yet.",
+    "partnerPerformance": "Partner Score",
+    "statusExcellent": "Excellent",
+    "statusGood": "Good",
+    "statusAtRisk": "At Risk",
+    "fulfillmentRate": "Fulfillment Rate",
+    "keepItUp": "High fulfillment boosts your ranking in S3 Dispatch.",
+    "status": "Status",
+    "tabAnalysis" : "Analysis"
 }
+

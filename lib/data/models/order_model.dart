@@ -9,8 +9,8 @@ import '../enums/item_status.dart';
 class OrderModel extends Equatable {
   final String id; 
   final String customerId; 
-  final String partnerId; 
-  final String riderId;
+  final String? partnerId; 
+  final String? riderId;
   final double? total;
   final OrderStatus status;
   final List<OrderItemModel> items;
@@ -20,8 +20,8 @@ class OrderModel extends Equatable {
   const OrderModel({
     required this.id,
     required this.customerId,
-    required this.partnerId,
-    required this.riderId,
+    this.partnerId,
+    this.riderId,
     this.total,
     required this.status,
     required this.items,
@@ -59,13 +59,13 @@ class OrderModel extends Equatable {
   factory OrderModel.fromMap(Map<String, dynamic> map) {
     return OrderModel(
       id: map['id'] as String,
-      customerId: map['userId'] as String,
-      partnerId: map['partnerId'] as String,
-      riderId: map['riderId'] as String,
-      total: (map['estimatedTotal'] as num).toDouble(),
-      items: (map['items'] as List)
+      customerId: map['customerId'] as String,
+      partnerId: map['partnerId'] as String?,
+      riderId: map['riderId'] as String?,
+      total: map['total'] != null ? (map['total'] as num).toDouble() : 0 ,
+      items: map['items'] != null ?(map['items'] as List)
           .map((itemMap) => OrderItemModel.fromMap(itemMap))
-          .toList(),
+          .toList(): [],
       status: OrderStatusExtension.fromString(map['status'] ?? 'draft'),
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       finishedAt: (map['finishedAt'] as Timestamp?)?.toDate(),
@@ -99,9 +99,9 @@ class OrderModel extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'userId': customerId,
+      'customerId': customerId,
       'riderId': riderId,
-      'estimatedTotal': total,
+      'total': total,
       'status': status.name,
       'items': items.map((item) => item.toMap()).toList(),
       'createdAt': Timestamp.fromDate(createdAt),
@@ -138,7 +138,7 @@ class OrderItemModel extends Equatable {
 
   factory OrderItemModel.fromMap(Map<String, dynamic> map) {
     return OrderItemModel(
-      id: map['productId'] as String,
+      id: map['id'] as String,
       description: map['description'] as String,
       brand: map['brand'] as String,
       category: map['category'] as String,
@@ -150,7 +150,7 @@ class OrderItemModel extends Equatable {
   }
 
   OrderItemModel copyWith({
-    String? productId,
+    String? id,
     String? description,
     String? brand,
     String? category,
@@ -160,7 +160,7 @@ class OrderItemModel extends Equatable {
     ItemStatus? status,
   }) {
     return OrderItemModel(
-      id: productId ?? this.id,
+      id: id ?? this.id,
       description: description ?? this.description,
       brand: brand ?? this.brand,
       category: category ?? this.category,
@@ -173,7 +173,7 @@ class OrderItemModel extends Equatable {
 
   Map<String, dynamic> toMap() {
     return {
-      'productId': id,
+      'id': id,
       'description': description,
       'brand': brand,
       'category': category,

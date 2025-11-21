@@ -7,6 +7,8 @@ import 'package:suefery_partner/data/models/user_model.dart';
 import 'package:suefery_partner/data/services/auth_service.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 import 'package:suefery_partner/locator.dart';
+import '../../core/utils/geohash.dart';
+import '../../data/enums/partner_status.dart';
 import '../../data/enums/user_role.dart';
 
 final _log = LoggerRepo('LoginState');
@@ -85,26 +87,25 @@ class AuthCubit extends Cubit<AuthState> {
   UserModel? get currentDbUser => _authService.currentAppUser;
 
   AuthCubit() : super(AuthState()) {
-      _authStatusSubscription =
-          _authService.onAuthStatusChanged().listen((authStatus) async {
+      _authStatusSubscription = _authService.onAuthStatusChanged().listen((authStatus) async {
+        emit(state.copyWith( authState: authStatus));
+        _log.i('onAuthStatusChanged: user is ${authStatus.name}');  
         if (authStatus == AuthStatus.authenticated) {
+          _log.i('onAuthStatusChanged: user authenticated checking user role');
           await _checkUserRole();
-        } else {
-          emit(state.copyWith(
-              authState: authStatus,
-              user: _authService.currentAppUser,
-            ),
-          );
         }
       });
     }
 
   Future<void> _checkUserRole() async {
+    _log.i('Checking user role...');
     emit(state.copyWith(
       isLoading: true,
       errorMessage: '',
     ));
+    _log.i('Current Firebase User: ${currentFirebaseUser?.uid}');
     if (currentFirebaseUser == null) {
+      _log.i('user is null');
       emit(
         state.copyWith(
           isLoading: false,
@@ -130,16 +131,15 @@ class AuthCubit extends Cubit<AuthState> {
           emit(
             state.copyWith(
             isLoading: false,
-            errorMessage: 'This app is for partners only.'
+            errorMessage: 'This app is for partners only.', authState: AuthStatus.unauthenticated
           ));
         }
       } else {
         // User document doesn't exist, log them out
-        await _authService.logOut();
-        emit(state.copyWith(
-            isLoading: false,
-            errorMessage: 'User not found. Please contact support.'
-        ));
+          emit(state.copyWith(
+                        isLoading: false,
+                        errorMessage: 'User not found. Please contact support.', authState: AuthStatus.unauthenticated
+                    ));
       }
     } catch (e) {
       emit(state.copyWith(
@@ -292,16 +292,27 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> checkVerificationStatus() async {
-    final formState = state;
-    emit(formState.copyWith(isLoading: true, errorMessage: ''));
+    emit(state.copyWith(isLoading: true, errorMessage: ''));
     try {
       await _authService.reloadUser();
-      // Listener will catch the verified state and transition to AuthAuthenticated
+      
+      // Manually check the verification status after reloading.
+      final firebaseUser = _authService.currentFirebaseUser;
+      if (firebaseUser != null && firebaseUser.emailVerified) {
+        _log.i('Verification status check: Email is now verified. Emitting authenticated.');
+        // The user is now verified, emit the authenticated state to trigger navigation.
+        emit(state.copyWith(authState: AuthStatus.authenticated, isLoading: false));
+      } else {
+        _log.i('Verification status check: Email is still not verified.');
+      }
     } catch (e) {
-      final errorMessage = 'Sign Out Failed: ${e.toString().split(':').last.trim()}';
-      emit(formState.copyWith(isLoading: false, errorMessage: errorMessage));
+      final errorMessage = 'Failed to check status: ${e.toString()}';
       _log.e(errorMessage);
+      emit(state.copyWith(errorMessage: errorMessage, isLoading: false));
+    }finally{
+      // The isLoading flag is now handled within the try/catch block.
     }
+
   }
 
   Future<void> sendEmailVerification() async {
@@ -311,8 +322,12 @@ class AuthCubit extends Cubit<AuthState> {
       // Listener will catch the verified state and transition to AuthAuthenticated
     } catch (e) {
       final errorMessage = 'Verification Email Failed: ${e.toString().split(':').last.trim()}';
-      emit(state.copyWith(isLoading: false, errorMessage: errorMessage));
+      emit(state.copyWith(errorMessage: errorMessage));
       _log.e(errorMessage);
+    }finally{
+            Future.delayed(const Duration(seconds: 5), () {
+          emit(state.copyWith(isLoading: false,errorMessage: ''));
+      });
     }
   }
   
@@ -340,6 +355,43 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  
+  Future<void> completeSetup({
+    required String storeName, 
+    required String address, 
+    required String city,
+    required String bio,
+    required String website,
+    required List<String> tags,
+    required double lat,
+    required double lng,
+  }) async {
+    if (state.user == null) return;
+
+    emit(state.copyWith(isLoading: true));
+    try {
+      final newStoreId = "${storeName.toLowerCase().replaceAll(' ', '_')}_${state.user!.id.substring(0,4)}";
+      final geohash = GeohashUtils.encode(lat, lng);
+
+      await _authService.updateUser(state.user!.id,
+        storeId : newStoreId,
+        address : address,
+        city: city,
+        bio: bio,
+        website: website,
+        tags: tags,
+        lat: lat,
+        lng : lng,
+        creationTimestamp: DateTime.now(),
+        geohash: geohash,
+        partnerStatus: PartnerStatus.active, 
+      );
+
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, errorMessage: "Setup failed: $e"));
+    }
+  }
+  
   @override
   Future<void> close() {
     _authStatusSubscription.cancel();

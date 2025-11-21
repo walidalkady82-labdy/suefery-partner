@@ -39,6 +39,13 @@ class RepoAuth implements IRepoAuth{
     final googleSignIn = GoogleSignIn.instance;
     final log = RepoLog('AuthRepo');
     // Use emulator only in debug mode and if requested
+    await googleSignIn.initialize(
+      clientId: dotenv.env['googleSignInwebClientId'],
+      // scopes: [
+      //   'email',
+      //   'https://www.googleapis.com/auth/contacts.readonly',
+      // ],
+    );
     if (kDebugMode && useEmulator) {
       try {
         log.i('AuthRepo: Connecting to Firebase Auth Emulator...');
@@ -75,7 +82,7 @@ class RepoAuth implements IRepoAuth{
   Future<void> reloadUser() async {
     // reload() can throw if the user's token is invalid
     try {
-      await _firebaseAuth.currentUser?.reload().withDefaultTimeout();
+      await _firebaseAuth.currentUser?.reload();
     } on FirebaseAuthException catch (e) {
       _log.e('Failed to reload user: ${e.message}');
       // Re-throw the exception so the service can catch it
@@ -106,7 +113,7 @@ class RepoAuth implements IRepoAuth{
         );
       }
       _log.i('Sign in with Google successful.');
-      return await _firebaseAuth.signInWithCredential(credential).withDefaultTimeout();
+      return await _firebaseAuth.signInWithCredential(credential);
     } catch (e) {
       _log.e('Google Sign-In Error: $e');
       rethrow;
@@ -140,13 +147,19 @@ class RepoAuth implements IRepoAuth{
   @override
   Future<void> logOut() async {
     // Must sign out of both providers to ensure a clean slate
-    await _googleSignIn.signOut().withDefaultTimeout();
-    await _firebaseAuth.signOut().withDefaultTimeout();
+    final isGoogleUser = currentUser?.providerData
+              .any((userInfo) => userInfo.providerId == 'google.com') ??
+          false;
+    if(isGoogleUser) {
+      await _googleSignIn.signOut();
+    }else {
+      await _firebaseAuth.signOut();
+    }
   }
 
   @override
   Future<void> sendPasswordResetEmail(String email) {
-    return _firebaseAuth.sendPasswordResetEmail(email: email).withDefaultTimeout();
+    return _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
   @override
@@ -175,13 +188,13 @@ class RepoAuth implements IRepoAuth{
       // depending on your business logic
       return Future.value();
     }
-    return user.sendEmailVerification().withDefaultTimeout();
+    return user.sendEmailVerification();
   }
   
   @override
   Future<String> verifyResetCode(String code) {
     // This method returns the user's email if the code is valid
-    return _firebaseAuth.verifyPasswordResetCode(code).withDefaultTimeout();
+    return _firebaseAuth.verifyPasswordResetCode(code);
   }
   
   @override

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:suefery_partner/data/services/pref_service.dart';
-import 'package:suefery_partner/locator.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// A simple ValueNotifier to manage the app's current locale.
 /// This allows the MaterialApp to reactively update its locale.
-class LocaleNotifier extends ValueNotifier<Locale> {
-  final PrefService _prefService = sl<PrefService>();
+class LocaleNotifier extends ValueNotifier<Locale?> {
 
-  LocaleNotifier(Locale value) : super(value);
+  LocaleNotifier(super.value);
 
   /// Sets a new locale and notifies listeners.
-  void setLocale(Locale newLocale) {
+  Future<void> setLocale(Locale newLocale) async {
+    final prefs = SharedPreferencesAsync();
     if (value == newLocale) return; // Don't do anything if the locale is the same
     value = newLocale;
-    _prefService.language;  //('selected_language', newLocale.languageCode)
+    await prefs.setString('language', newLocale.languageCode);
+    notifyListeners();
   }
 }

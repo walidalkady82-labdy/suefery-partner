@@ -51,8 +51,14 @@ class RepoFirestore implements IRepoFirestore {
   }
 
   @override
-  String generateId(String path) {
-    final ref = _firestore.collection(path).doc();
+  Future<String> generateId(String path,{String? id}) async {
+    DocumentReference<Map<String, dynamic>> ref;
+    if (id == null) {
+      ref = _firestore.collection(path).doc();
+    }else{
+      ref = _firestore.collection(path).doc(id);
+    }
+    await ref.set({});
     return ref.id;
   }
 
@@ -187,7 +193,7 @@ class RepoFirestore implements IRepoFirestore {
   @override
   Future<void> remove(String path, String id) async {
     try {
-      await _firestore.collection(path).doc(id).delete().withDefaultTimeout();
+      await _firestore.collection(path).doc(id).delete();
     } catch (e) {
       _log.e("Error removing document in $path with ID $id: $e");
       rethrow;

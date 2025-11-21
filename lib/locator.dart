@@ -7,12 +7,14 @@ import 'package:suefery_partner/data/repositories/i_repo_firestore.dart';
 import 'package:suefery_partner/data/repositories/repo_firestore.dart';
 import 'package:suefery_partner/data/services/order_service.dart';
 import 'data/repositories/i_repo_pref.dart';
+import 'data/services/analytics_service.dart';
 import 'data/services/auth_service.dart';
 import 'data/services/inventory_service.dart';
 import 'data/services/pref_service.dart';
+import 'data/services/promo_service.dart';
 import 'data/services/remote_config_service.dart';
 import 'data/repositories/repo_auth.dart';
-import 'data/repositories/repo_prefs.dart';
+import 'data/repositories/repo_pref.dart';
 
 final sl = GetIt.instance; // sl = Service Locator
 /// Initializes all services and repositories for the app.
@@ -47,6 +49,12 @@ Future<void> initLocator(FirebaseApp firebaseApp) async {
     
   // --- SERVICES (The "Managers") ---
   
+  // Prefs Config Service (Async) ---
+
+  sl.registerLazySingleton<PrefService>(() => PrefService(
+    sl<IRepoPref>(),
+  ));
+
   // Remote Config Service (Async) ---
   sl.registerSingleton<RemoteConfigService>(configService);
 
@@ -57,15 +65,21 @@ Future<void> initLocator(FirebaseApp firebaseApp) async {
         sl<PrefService>(),
       ));
 
-  // Prefs Service
-  sl.registerLazySingleton<PrefService>(() => PrefService(
-        sl<IRepoPref>(), // GetIt finds the registered IPrefsRepository
-      ));
-      
   // Inventory Service
   sl.registerLazySingleton<InventoryService>(() => InventoryService(
        sl<IRepoFirestore>(), // GetIt finds the registered IFirestoreRepository
   ));
+
+  // Promo Service 
+  sl.registerLazySingleton<PromoService>(() => PromoService(
+       sl<IRepoFirestore>(), // GetIt finds the registered IFirestoreRepository
+  ));
+
+  // Analytics Service
+  sl.registerLazySingleton<AnalyticsService>(() => AnalyticsService(
+       sl<IRepoFirestore>(), // GetIt finds the registered IFirestoreRepository
+  ));
+
   // Register Firebase Functions with the correct region
   sl.registerLazySingleton(() => FirebaseFunctions.instanceFor(app: firebaseApp, region: 'us-central1'));
 

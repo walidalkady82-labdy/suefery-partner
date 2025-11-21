@@ -9,6 +9,8 @@ class ProductModel {
   final double price;
   bool isAvailable; // The partner controls this
   final DateTime? createdAt;
+  final DateTime? updatedAt;
+
 
   ProductModel({
     required this.id,
@@ -18,6 +20,7 @@ class ProductModel {
     required this.price,
     this.isAvailable = true,
     this.createdAt,
+    this.updatedAt,
   });
   factory ProductModel.fromMap(Map<String, dynamic> map) {
      DateTime? parseTimestamp(dynamic timestamp) {
@@ -36,6 +39,7 @@ class ProductModel {
       price: (map['price'] as num).toDouble(),
       isAvailable: map['isAvailable'] as bool,
       createdAt: parseTimestamp(map['createdAt']),
+      updatedAt: parseTimestamp(map['updatedAt']),
     );
   }
   
@@ -74,6 +78,7 @@ class ProductModel {
     double? price,
     bool? isAvailable,
     DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -83,6 +88,7 @@ class ProductModel {
       price: price ?? this.price,
       isAvailable: isAvailable ?? this.isAvailable,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
   Map<String, dynamic> toMap() {
@@ -94,6 +100,7 @@ class ProductModel {
       'price': price,
       'isAvailable': isAvailable,
       if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
+      if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
     };
   }
 }

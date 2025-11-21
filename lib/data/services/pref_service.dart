@@ -18,7 +18,7 @@ class PrefService {
 
   // --- Notification ---
   Future<bool> get isEnableNotifcations async =>
-      await _prefsRepo.getBool(PreferencesKey.enableNotifications.name);
+       _prefsRepo.getBool(PreferencesKey.enableNotifications.name);
 
   Future<void> setEnableNotifcations(bool value) async {
     await _prefsRepo.setBool(PreferencesKey.enableNotifications.name, value);

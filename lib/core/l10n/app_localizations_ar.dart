@@ -159,7 +159,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get checkStatusButton => 'تحقق من الحالة';
 
   @override
-  String get toSignup => 'للتسجيل';
+  String get toSignup => 'لا يوجد لديك حساب؟ سجل الان';
 
   @override
   String get toLogin => 'لتسجيل الدخول';
@@ -355,4 +355,109 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleteAccountHint => 'الرجاء كتابة DELETE للتأكيد.';
+
+  @override
+  String get setupStoreScreenTitle => 'إعداد متجرك';
+
+  @override
+  String get setupStoreMainMessage => 'خطوة أخيرة!';
+
+  @override
+  String get setupStoreMain1Message =>
+      'نحتاج إلى تفاصيل متجرك لربطك بالعملاء القريبين.';
+
+  @override
+  String get storeNameLabel => 'اسم المتجر';
+
+  @override
+  String get setupTitle => 'إعداد متجرك';
+
+  @override
+  String get stepInfo => 'بيانات المتجر';
+
+  @override
+  String get stepLocation => 'الموقع';
+
+  @override
+  String get stepTags => 'التصنيفات';
+
+  @override
+  String get oneLastStep => 'خطوة أخيرة!';
+
+  @override
+  String get setupSubtitle => 'نحتاج إلى تفاصيل متجرك لربطك بالعملاء القريبين.';
+
+  @override
+  String get storeName => 'اسم المتجر';
+
+  @override
+  String get bioLabel => 'نبذة / شعار';
+
+  @override
+  String get websiteLabel => 'الموقع الإلكتروني (اختياري)';
+
+  @override
+  String get coordsLabel => 'الإحداثيات (خط الطول/العرض)';
+
+  @override
+  String get coordTip =>
+      'تلميح: استخدم خرائط جوجل للعثور على إحداثياتك الدقيقة.';
+
+  @override
+  String get tagsTitle => 'ماذا تبيع؟';
+
+  @override
+  String get tagsSubtitle => 'مثال: بقالة، صيدلية، وجبات خفيفة';
+
+  @override
+  String get addTagHint => 'أضف تصنيف...';
+
+  @override
+  String get noTags => 'لم تتم إضافة أي تصنيفات بعد.';
+
+  @override
+  String get completeSetup => 'إكمال الإعداد';
+
+  @override
+  String get next => 'التالي';
+
+  @override
+  String get back => 'السابق';
+
+  @override
+  String get revenueThisMonth => 'الأرباح (شهري)';
+
+  @override
+  String get totalOrders => 'إجمالي الطلبات';
+
+  @override
+  String get mostWantedItems => 'الأكثر طلباً';
+
+  @override
+  String get noDataYet => 'لا توجد بيانات حتى الآن.';
+
+  @override
+  String get partnerPerformance => 'أداء الشريك';
+
+  @override
+  String get statusExcellent => 'ممتاز';
+
+  @override
+  String get statusGood => 'جيد';
+
+  @override
+  String get statusAtRisk => 'يحتاج تحسين';
+
+  @override
+  String get fulfillmentRate => 'معدل الإكمال';
+
+  @override
+  String get keepItUp =>
+      'معدل الإكمال المرتفع يزيد من ترتيبك في استلام الطلبات.';
+
+  @override
+  String get status => 'الحالة';
+
+  @override
+  String get tabAnalysis => 'تحليل';
 }

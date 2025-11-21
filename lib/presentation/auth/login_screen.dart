@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:suefery_partner/core/l10n/l10n_extension.dart';
+import 'package:suefery_partner/main.dart';
+import '../../core/l10n/app_localizations.dart';
 import '../../data/enums/auth_status.dart';
 import 'auth_cubit.dart';
+import 'package:suefery_partner/main.dart';
 
 
 class LoginScreen1 extends StatelessWidget {
@@ -137,7 +140,7 @@ class LoginScreen extends StatelessWidget {
       // Using theme background color
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(strings.loginTextButton),
+        title: Text(strings.loginTitle),
         centerTitle: true,
       ),
       body: Center(
@@ -163,6 +166,25 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => context.read<AuthCubit>().signInWithGoogle(),
+                        style: ElevatedButton.styleFrom(
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(16),
+                          backgroundColor: theme.colorScheme.surface,
+                        ),
+                        child: Image.asset(
+                          'assets/images/google-icon-logo.png',
+                          height: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
                   // Logo Icon
                   Icon(
                     Icons.delivery_dining, 
@@ -216,7 +238,7 @@ class LoginScreen extends StatelessWidget {
                   // Login Button
                   ElevatedButton(
                     onPressed: authCubit.signIn,
-                    child: Text(strings.loginTextButton),
+                    child: Text(strings.login),
                   ),
                   const SizedBox(height: 16),
                   
@@ -224,6 +246,21 @@ class LoginScreen extends StatelessWidget {
                   TextButton(
                     onPressed: authCubit.togglePage,
                     child: Text(strings.toSignup),
+                  ),
+                  const SizedBox(height: 24),
+                  // Language toggle button
+                  TextButton(
+                    onPressed: () {
+                      final currentLocale = localeNotifier.value;
+                      if (currentLocale?.languageCode == 'en') {
+                        localeNotifier.setLocale(const Locale('ar'));
+                      } else {
+                        localeNotifier.setLocale(const Locale('en'));
+                      }
+                    },
+                    child: Text(
+                      localeNotifier.value?.languageCode == 'en' ? 'العربية' : 'English',
+                    ),
                   ),
                 ],
               );

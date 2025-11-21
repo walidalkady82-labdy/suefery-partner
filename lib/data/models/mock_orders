@@ -7,7 +7,7 @@ class MockOrders {
   static final order1 = OrderModel(
     id: 'order-001',
     customerId: 'WCtpbkvDN3fDUPVQzRB2y1Wtm7vi',
-    partnerId: 'partner-abc',
+    partnerId: 'kapLDye1ZNPWkfLe6GXVCWNBNjhh',
     riderId: 'rider-xyz',
     total: 160.50,
     status: OrderStatus.draft,

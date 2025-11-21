@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:suefery_partner/core/extensions/future_extension.dart';
 import '../../core/errors/authentication_exception.dart';
 import '../enums/auth_status.dart';
 import '../enums/partner_status.dart';
@@ -45,24 +46,107 @@ class AuthService{
   /// app's internal [AppUser?] model.
   Stream<AuthStatus> onAuthStatusChanged() {
     return _authRepository.authStateChanges.asyncMap((User? user) async {
-      if (user != null) {
-        // User is authenticated, fetch their full profile from Firestore.
-        _currentAppUser = await getUser(user.uid);
-        // --- S3 (Keep-Alive) LOGIC START ---
-        // User is logged in, start the keep-alive timer
-        startKeepAlive(user.uid);
-        // --- S3 LOGIC END ---
-        return AuthStatus.authenticated;
-      } else {
-        // User is logged out, clear the cached user model.
-        _currentAppUser = null;
-        // --- S3 (Keep-Alive) LOGIC START ---
-        // User is logged out, stop the timer
-        stopKeepAlive();
-        // --- S3 LOGIC END ---
+      try {
+        _log.i('onAuthStatusChanged checking user status...');
+        if (user != null) {
+          // User is authenticated, try to fetch their full profile from Firestore.
+          _log.w('onAuthStatusChanged: User authenticated, getting user data from database');
+          _currentAppUser = await getUser(user.uid);
+
+          // --- SELF-HEALING & RECOVERY ---
+          if (_currentAppUser == null) {
+            _log.w('onAuthStatusChanged: User authenticated but no Firestore record. Recovering...');
+            await _fetchCurrentUser().withDefaultTimeout();
+            // After recovery, we MUST re-fetch the user data to proceed.
+            _log.i('onAuthStatusChanged: Recovery complete.');
+            _currentAppUser = await getUser(user.uid);
+            if (!user.emailVerified) {
+              _log.w('onAuthStatusChanged: User email is not verified.');
+              return AuthStatus.awaitingVerification;
+            }
+          }
+
+          // If user is still null after recovery attempt, something is wrong. Log out.
+          if (_currentAppUser == null) {
+            _log.e('onAuthStatusChanged: CRITICAL - Failed to fetch or recover user. deleting auth data.');
+            await user.delete();
+            await logOut();
+            return AuthStatus.unauthenticated;
+          }
+
+          // --- EMAIL VERIFICATION CHECK (APPLIES TO ALL LOGGED-IN USERS) ---
+          if (!user.emailVerified) {
+            _log.w('onAuthStatusChanged: User email is not verified.');
+            // IMPORTANT: Keep the user object populated even when awaiting verification.
+            _currentAppUser = await getUser(user.uid);
+            return AuthStatus.awaitingVerification;
+          }
+
+          _log.i('onAuthStatusChanged: User is authenticated and verified.');
+          startKeepAlive(user.uid);
+          return AuthStatus.authenticated;
+        } else {
+          // User is logged out, clear the cached user model.
+          _currentAppUser = null;
+          stopKeepAlive();
+          return AuthStatus.unauthenticated;
+        }
+      } on TimeoutException catch (e) {
+        _log.e('onAuthStatusChanged: Timeout: $e');
+        return AuthStatus.unauthenticated;
+      }
+      on FirebaseAuthException catch (e) {
+        _log.e('onAuthStatusChanged: FirebaseAuthException: $e');
+        return AuthStatus.unauthenticated;
+      }
+       catch (e) {
+        _log.e('Error in onAuthStatusChanged: $e');
         return AuthStatus.unauthenticated;
       }
     });
+  }
+      /// --- SELF-HEALING FETCH ---
+  Future<void> _fetchCurrentUser() async {
+    try {
+      final uid = currentFirebaseUser?.uid;
+      //final firebaseUser = _authService.currentUser;
+
+      if (uid != null) {
+        final userModel = await getUser(uid);
+        
+        if (userModel != null) {
+          // Happy Path: User profile exists
+          // emit(state.copyWith(authState: AuthStatus.authenticated, user: user, isLoading: false));
+        } else {
+          // --- EDGE CASE RECOVERY ---
+          // Auth exists, but Firestore Doc is missing.
+          // We recreate a "Skeleton" profile so the user isn't stuck.
+          
+          final recoveredUser = UserModel(
+            id: uid,
+            email: currentFirebaseUser?.email ?? '',
+            firstName: '', // Lost in crash, user can update in Profile later
+            lastName: '',
+            phone: currentFirebaseUser?.phoneNumber ?? '',
+            role: UserRole.partner,
+            storeId: '', // Crucial: This ensures !isSetupComplete returns FALSE
+            partnerStatus: PartnerStatus.inactive,
+            creationTimestamp: DateTime.now(),
+          );
+
+          // Save the skeleton to Firestore immediately
+          await createUser(recoveredUser);
+
+          // Update app state so AuthWrapper sees it
+          // emit(state.copyWith(authState: AuthStatus.authenticated, user: recoveredUser, isLoading: false));
+          
+          _log.w("Recovered orphan account for user: $uid");
+        }
+      }
+    } catch (e) {
+      _log.e("Error fetching user: $e");
+      // emit(state.copyWith(isLoading: false, errorMessage: "Failed to load profile. Please check connection."));
+    }
   }
    // --- NEW: S3 (Keep-Alive) HELPER METHODS ---
   void startKeepAlive(String partnerId) {
@@ -99,7 +183,6 @@ class AuthService{
   }
   
   // --- END S3 HELPER METHODS ---
-
 
   /// Handles the business logic for Google Sign-In.
   Future<UserModel?> signInWithGoogle() async {
@@ -155,6 +238,7 @@ class AuthService{
         _currentAppUser = UserModel.fromMap(partnerMap);
 
         await _handleSuccessfulLogin(user);
+        await sendEmailVerification();
         return UserModel.fromFirebaseUser(user);
       }
       return null;
@@ -218,9 +302,11 @@ class AuthService{
       await _prefRepo.setUserAuthToken(token);
     }
     // For email/pass sign-in, they are never a "new" user in this context.
+    _log.i("setting isFirstLogin to false for user: ${user.email}");
     await _prefRepo.setIsFirstLogin(false);
     await _prefRepo.setUserLoggedInTime(DateTime.now());
     await _prefRepo.setUserIsLoggedin(true);
+    
     _log.i("Exiting _handleSuccessfulLogin for user: ${user.email}");
   }
 
@@ -250,14 +336,18 @@ class AuthService{
   /// Signs the user out and clears their session data from preferences.
   Future<bool> logOut() async {
     try {
+      // Check if the current user signed in with Google.
+      // The IRepoAuth.logOut() should handle both Firebase and Google sign out.
+      // The repository implementation should ensure it uses the correct, initialized
+      // GoogleSignIn instance.
       await _authRepository.logOut();
+      _log.i('User logged out from authentication provider.');
     } catch (e) {
       _log.e('Error during sign out: $e');
-      // Still proceed to clear local session
+      // Even if provider logout fails, proceed to clear local session data.
     }
     await _clearUserSession();
-    final bool isLoggedin = await _prefRepo.isUserLoggedin;
-    return !isLoggedin; // Return true if logged out successfully
+    return !_prefRepo.isUserLoggedin; // Return true if logged out successfully
   }
 
   /// Centralized logic to clear user data from prefs.
@@ -300,10 +390,6 @@ class AuthService{
     } on FirebaseAuthException catch (e) {
       _log.e("Registration Error: $e");
       throw AuthenticationFailure(e.message ?? 'send verification email failed');
-    }
-    catch (e) {
-      _log.e('Error sending verification email: $e');
-      rethrow;
     }
   }
 
@@ -369,6 +455,7 @@ class AuthService{
   
   Future<void> reloadUser() async {
     try {
+      _log.i('Reloading user...');
       await _authRepository.reloadUser();
     }catch (e) {
       _log.e('Error during reloading user: $e');
@@ -405,38 +492,104 @@ class AuthService{
 
   /// Fetches a single user by their ID.
   Future<UserModel?> getUser(String userId) async {
-    final snapshot =
-        await _firestoreRepo.getDocumentSnapShot(_collectionPath, userId);
-    if (!snapshot.exists || snapshot.data() == null) {
+    try {
+      final snapshot =
+          await _firestoreRepo.getDocumentSnapShot(_collectionPath, userId);
+      if (!snapshot.exists || snapshot.data() == null) {
+        return null;
+      }
+      return UserModel.fromMap(snapshot.data()!);
+    } catch (e) {
+      _log.e('Error fetching user data: $e');
       return null;
     }
-    return UserModel.fromMap(snapshot.data()!);
   }
 
   /// Creates a new user in the database from an [UserModel] object.
-  Future<void> createUser(UserModel user) {
+  Future<void> createUser(UserModel user) async{
     // Business Logic: Ensures a new user is created with their ID
     // and handles data conversion.
+    final docId = await  _firestoreRepo.generateId(_collectionPath,id: user.id);
     return _firestoreRepo.updateDocument(
       _collectionPath,
-      user.id, // Use update/set to enforce the ID
+      docId, // Use update/set to enforce the ID
       user.toMap(),
     );
   }
 
   /// Updates specific fields for a user.
-  Future<void> updateUser(String userId, {String? name, String? email , String? fcmToken}) {
+  Future<void> updateUser(String userId, {
+    
+    String? name, 
+    String? firstName, 
+    String? lastName, 
+    String? phone, 
+    UserRole? role, 
+    String? storeId, 
+    PartnerStatus? partnerStatus, 
+    DateTime? creationTimestamp,
+    String? email , 
+    String? fcmToken,
+    String? storeName,
+    String? address,
+    String? city,
+    String? bio,
+    String? website,
+    List<String>? tags,
+    String? specificPersonaGoal,
+    String? geohash,
+    double? lat,
+    double? lng
+
+    }) {
+
     final dataToUpdate = <String, dynamic>{};
-    if (name != null) {
-      dataToUpdate['name'] = name;
-    }
-    if (email != null) {
-      dataToUpdate['email'] = email;
-    }
-     if (fcmToken != null) {
-      dataToUpdate['fcmToken'] = fcmToken;
-    }
+
+    if (name != null) dataToUpdate['name'] = name;
+    if (email != null) dataToUpdate['email'] = email;
+    if (fcmToken != null) dataToUpdate['fcmToken'] = fcmToken;
+    if (storeName != null) dataToUpdate['storeName'] = storeName;
+    if (address != null) dataToUpdate['address'] = address;
+    if (city != null) dataToUpdate['city'] = city;
+    if (bio != null) dataToUpdate['bio'] = bio;
+    if (website != null) dataToUpdate['website'] = website;
+    if (tags != null) dataToUpdate['tags'] = tags;
+    if (specificPersonaGoal != null) dataToUpdate['specificPersonaGoal'] = specificPersonaGoal;
+    if (geohash != null) dataToUpdate['geohash'] = geohash;
+    if (lat != null) dataToUpdate['lat'] = lat;
+    if (lng != null) dataToUpdate['lng'] = lng;
+    if (firstName != null) dataToUpdate['firstName'] = firstName;
+    if (lastName != null) dataToUpdate['lastName'] = lastName;
+    if (phone != null) dataToUpdate['phone'] = phone;
+    if (role != null) dataToUpdate['role'] = role.name;
+    if (storeId != null) dataToUpdate['storeId'] = storeId;
+    if (partnerStatus != null) dataToUpdate['partnerStatus'] = partnerStatus.name;
+    if (creationTimestamp != null) dataToUpdate['creationTimestamp'] = creationTimestamp.toIso8601String();
+
+    
+    
     return _firestoreRepo.updateDocument(_collectionPath, userId, dataToUpdate);
+  }
+
+  Future<void> completeSetup({
+    required String storeName,
+    String? bio,
+    String? website,
+    required String address,
+    required String city,
+    required List<String> tags,
+    required double lat,
+    required double lng,
+  }) async {
+    updateUser(
+      currentAppUser!.id,
+      storeName: storeName,
+      address: address,
+      city: city,
+      tags: tags,
+      lat: lat,
+      lng: lng,
+    );
   }
 
 }

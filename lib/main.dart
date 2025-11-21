@@ -7,9 +7,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suefery_partner/core/l10n/app_localizations.dart';
+import 'package:suefery_partner/core/utils/locale_notifier.dart';
 import 'package:suefery_partner/core/utils/themes.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
+import 'package:suefery_partner/data/services/pref_service.dart';
 import 'package:suefery_partner/locator.dart';
 import 'package:suefery_partner/presentation/auth/auth_checker.dart';
 import 'package:suefery_partner/presentation/auth/auth_cubit.dart';
@@ -19,10 +22,17 @@ import 'presentation/settings/settings_cubit.dart';
 
 
 final _log = LoggerRepo('main');
+late final LocaleNotifier localeNotifier;
+
 Future<void> main() async {
   // Ensure Flutter engine is initialized before running the app
   _log.i('initializing app...');
   WidgetsFlutterBinding.ensureInitialized();
+  _log.i('setting app local...');
+  final prefs = await SharedPreferences.getInstance();
+  final lang = prefs.getString('language');
+  final initialLanguageCode = lang ?? 'en';
+  localeNotifier = LocaleNotifier(Locale(initialLanguageCode)); // Default to English
   _log.i('Loading app...');
   runApp(const AppContainer(child:SuefereyPartnerApp())
   );
@@ -151,6 +161,7 @@ class AppContainer extends StatefulWidget {
 
 class _AppContainerState extends State<AppContainer> {
   Future<void>? _initialization;
+  late final LocaleNotifier localeNotifier;
 
   @override
   void initState() {
@@ -260,29 +271,33 @@ class SuefereyPartnerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {  
     return MultiBlocProvider(
-            providers: [
-              BlocProvider<SettingsCubit>(
-                create: (context) => SettingsCubit(),
-              ),
-              BlocProvider<AuthCubit>(
-                create: (context) => AuthCubit(),
-              ),
-            ],
-            child: BlocBuilder<SettingsCubit, SettingsState>(
-              builder: (context, homeState) {
-                final settings = context.read<SettingsCubit>();
-                return MaterialApp(
-                  onGenerateTitle: (ctx) => AppLocalizations.of(ctx)?.appTitle ?? 'Suefery Partner',
-                  theme: lightTheme, // Always use the defined light theme
-                  darkTheme: darkTheme, // Always use the defined dark theme
-                  themeMode: settings.state.themeMode, // Use the themeMode from the SettingsCubit
-                  locale: settings.state.locale, // Use the locale from the SettingsCubit
-                  localizationsDelegates: AppLocalizations.localizationsDelegates,
-                  supportedLocales: AppLocalizations.supportedLocales,
-                  home:  AuthChecker(),
-                );
-              },
-            ),
+      providers: [
+        BlocProvider<SettingsCubit>(
+          create: (context) => SettingsCubit(),
+        ),
+        BlocProvider<AuthCubit>(
+          create: (context) => AuthCubit(),
+        ),
+      ],
+      child: ValueListenableBuilder<Locale?>(
+        valueListenable: localeNotifier,
+        builder: (context, locale, child) {
+          return BlocBuilder<SettingsCubit, SettingsState>(
+            builder: (context, settingsState) {
+                      return MaterialApp(
+                        onGenerateTitle: (ctx) => AppLocalizations.of(ctx)?.appTitle ?? 'Suefery Partner',
+                        theme: lightTheme, // Always use the defined light theme
+                        darkTheme: darkTheme, // Always use the defined dark theme
+                        themeMode: settingsState.themeMode, // Use the themeMode from the SettingsCubit
+                        locale: locale, // Use the locale from the LocaleNotifier
+                        localizationsDelegates: AppLocalizations.localizationsDelegates,
+                        supportedLocales: AppLocalizations.supportedLocales,
+                        home:  AuthChecker(),
+                      );
+            },
+          );
+        },
+      ),
     );
   }
 }

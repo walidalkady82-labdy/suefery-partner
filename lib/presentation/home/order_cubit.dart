@@ -1,23 +1,21 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:suefery_partner/data/services/inventory_service.dart';
 import 'package:suefery_partner/data/models/order_model.dart';
 import 'package:suefery_partner/data/services/auth_service.dart';
 import 'package:suefery_partner/data/services/order_service.dart';
 import 'package:suefery_partner/locator.dart';
 
 import '../../data/enums/item_status.dart';
-import '../../data/enums/order_status.dart';
 import '../../data/enums/partner_status.dart';
-import '../../data/models/product_model.dart';
 import '../../data/models/quoted_item.dart';
+import '../../data/services/inventory_service.dart';
 import '../../data/services/logging_service.dart';
 
 /// --- STATE ---
 class OrderState {
 
   final List<OrderModel> draftOrders;
+  final List<OrderModel> quotedOrders; // NEW: List for quoted orders
   final List<OrderModel> confirmedOrders;
   final PartnerStatus partnerStatus;
   
@@ -27,6 +25,7 @@ class OrderState {
 
   const OrderState({
     this.draftOrders = const [],
+    this.quotedOrders = const [], // Initialize new list
     this.confirmedOrders = const [],
     this.partnerStatus = PartnerStatus.inactive,
     this.isLoading = false,
@@ -35,6 +34,7 @@ class OrderState {
 
   OrderState copyWith({
     List<OrderModel>? draftOrders,
+    List<OrderModel>? quotedOrders, // Add to copyWith
     List<OrderModel>? confirmedOrders,
     PartnerStatus? partnerStatus,
     bool? isLoading,
@@ -42,6 +42,7 @@ class OrderState {
   }) {
     return OrderState(
       draftOrders: draftOrders ?? this.draftOrders,
+      quotedOrders: quotedOrders ?? this.quotedOrders, // Update new list
       confirmedOrders: confirmedOrders ?? this.confirmedOrders,
       partnerStatus: partnerStatus ?? this.partnerStatus,
       isLoading: isLoading ?? this.isLoading,
@@ -57,61 +58,57 @@ class OrderCubit extends Cubit<OrderState> {
   // --- Dependencies ---
   final OrderService _orderService = sl<OrderService>();
   final AuthService _authService = sl<AuthService>();
+  final InventoryService _inventoryService = sl<InventoryService>();
   // final PaymentService _paymentService; // Uncomment when ready
 
   StreamSubscription? _draftOrdersSubscription;
   StreamSubscription? _confirmedOrdersSubscription;
+  StreamSubscription? _quotedOrdersSubscription; // NEW: Subscription for quoted orders
   StreamSubscription? _statusSubscription;
 
   OrderCubit() : super(const OrderState());
   
   void loadOrders(String storeId) {
-    emit(state.copyWith(isLoading: true));
-    
-    // Listen to Draft Orders
+    // Set loading state only at the beginning.
+    emit(state.copyWith(isLoading: true, error: ''));
+
+    // Cancel previous subscriptions to avoid memory leaks.
     _draftOrdersSubscription?.cancel();
-    _draftOrdersSubscription = _orderService.getPendingOrdersStream(storeId).listen((draftOrders) {
-      if (!state.isLoading) {
-        emit(state.copyWith(draftOrders: draftOrders));
-      } else {
-        emit(state.copyWith(
-          draftOrders: draftOrders,
-          confirmedOrders: [],
-          partnerStatus: PartnerStatus.inactive, // Default
-        ));
-      }
-    }, onError: (e) => emit(state.copyWith(error:  e.toString())));
-
-    // Listen to Confirmed Orders
     _confirmedOrdersSubscription?.cancel();
-    _confirmedOrdersSubscription = _orderService.getConfirmedOrdersStream(storeId).listen((confirmedOrders) {
-      if (!state.isLoading) {
-        emit(state.copyWith(confirmedOrders: confirmedOrders));
-      } else {
-        emit(state.copyWith(
-          draftOrders: [],
-          confirmedOrders: confirmedOrders,
-          partnerStatus: PartnerStatus.inactive,
-        ));
-      }
-    }, onError: (e) => emit(state.copyWith(error:  e.toString())));
-
-    
-    // Listen to Partner Status
+    _quotedOrdersSubscription?.cancel(); // Cancel new subscription
     _statusSubscription?.cancel();
+
+    // Listen to each stream and update the state without overwriting other parts.
+    _draftOrdersSubscription = _orderService.getPendingOrdersStream(storeId).listen((draftOrders) {
+      emit(state.copyWith(draftOrders: draftOrders, isLoading: false));
+    }, onError: (e) {
+      _log.e('Draft Orders Stream Error: $e');
+      emit(state.copyWith(error: e.toString(), isLoading: false));
+    });
+
+    _confirmedOrdersSubscription = _orderService.getConfirmedOrdersStream(storeId).listen((confirmedOrders) {
+      emit(state.copyWith(confirmedOrders: confirmedOrders, isLoading: false));
+    }, onError: (e) {
+      _log.e('Confirmed Orders Stream Error: $e');
+      emit(state.copyWith(error: e.toString(), isLoading: false));
+    });
+
+    // NEW: Listen to Quoted Orders
+    _quotedOrdersSubscription = _orderService.getQuotedOrdersStream(storeId).listen((quotedOrders) {
+      emit(state.copyWith(quotedOrders: quotedOrders, isLoading: false));
+    }, onError: (e) {
+      _log.e('Quoted Orders Stream Error: $e');
+      emit(state.copyWith(error: e.toString(), isLoading: false));
+    });
+
     _statusSubscription = _authService.getPartnerStatusStream(storeId).listen((partnerStatus) {
-      if (!state.isLoading) {
-        emit(state.copyWith(partnerStatus: partnerStatus));
-      } else {
-        emit(state.copyWith(
-          draftOrders: [],
-          confirmedOrders: [],
-          partnerStatus: partnerStatus,
-        ));
-      }
-    }, onError: (e) => emit(state.copyWith(error:  e.toString())));
+      emit(state.copyWith(partnerStatus: partnerStatus, isLoading: false));
+    }, onError: (e) {
+      _log.e('Partner Status Stream Error: $e');
+      emit(state.copyWith(error: e.toString(), isLoading: false));
+    });
   }
-  // NEW: Submit Quote (S1 Logic)
+  // ---  Submit Quote (S1 Logic) & HARVEST INVENTORY ---
   Future<void> submitQuote(String orderId, List<QuotedItem> quotedItems) async {
     try {
       // 1. Convert List<QuotedItem> to List<OrderItemModel> with updated prices
@@ -128,8 +125,26 @@ class OrderCubit extends Cubit<OrderState> {
 
       // 2. Call the service with the correctly typed list
       await _orderService.submitQuote(orderId, updatedOrderItems, newTotal);
-    
-      // No need to fetch, stream will update
+      // 3. --- HARVESTING LOGIC ---
+      // Save quoted items to Partner's Inventory automatically
+      String storeId = _authService.currentAppUser!.storeId??""; 
+      if (storeId.isEmpty) {
+        return;
+      }
+      for (var qItem in quotedItems) {
+        // CHECK: Is the item available? (Did partner give a price?)
+        if (qItem.quotedPrice > 0) {
+           // YES -> Sync it to Inventory
+           await _inventoryService.syncItemFromQuote(
+             storeId: storeId, 
+             description: qItem.item.description, 
+             brand: "", // If OrderItemModel has brand, use it here.
+             price: qItem.quotedPrice,
+           );
+        }   
+        // NO (Price is 0) -> Skip. Do NOT create product.
+      }
+      // No need to fetch, stream will update}
     } catch (e) {
       emit(state.copyWith(error:e.toString()));
     }
@@ -146,6 +161,7 @@ class OrderCubit extends Cubit<OrderState> {
     @override
     Future<void> close() {
       _draftOrdersSubscription?.cancel();
+      _quotedOrdersSubscription?.cancel(); // Cancel new subscription
       _confirmedOrdersSubscription?.cancel();
       _statusSubscription?.cancel();
       return super.close();

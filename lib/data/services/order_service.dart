@@ -3,7 +3,6 @@ import 'package:suefery_partner/data/enums/order_status.dart';
 import 'package:suefery_partner/data/models/order_model.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
 
-import '../models/mock_orders.dart';
 import '../repositories/i_repo_firestore.dart';
 import 'remote_config_service.dart';
 
@@ -48,9 +47,9 @@ class OrderService {
   /// [partnerId] The ID of the partner/store to fetch orders for.
   /// Returns a stream of a list of [OrderModel].
   Stream<List<OrderModel>> getPendingOrdersStream(String partnerId) {
-    if(kDebugMode){
-      return Stream.value(MockOrders.allOrders);
-    }
+    // if(kDebugMode){
+    //   return Stream.value(MockOrders.allOrders);
+    // }
     _log.i('Streaming orders for partner: $partnerId');
     try {
       return _firestoreRepo
@@ -78,9 +77,9 @@ class OrderService {
   /// [partnerId] The ID of the partner/store to fetch orders for.
   /// Returns a stream of a list of [OrderModel].
   Stream<List<OrderModel>> getConfirmedOrdersStream(String partnerId) {
-    if(kDebugMode){
-      return Stream.value(MockOrders.allOrders);
-    }
+    // if(kDebugMode){
+    //   return Stream.value(MockOrders.allOrders);
+    // }
     _log.i('Streaming orders for partner: $partnerId');
     try {
       return _firestoreRepo
@@ -100,6 +99,39 @@ class OrderService {
     } catch (e, stackTrace) {
       _log.e('Failed to set up order stream', e, stackTrace);
       throw Exception('An error occurred while setting up the order stream.');
+    }
+  }
+  
+    /// Provides a real-time stream of quoted orders for a specific partner.
+  /// These are orders for which the partner has submitted a quote, and are
+  /// now awaiting customer confirmation.
+  ///
+  /// [partnerId] The ID of the partner/store to fetch orders for.
+  /// Returns a stream of a list of [OrderModel].
+  Stream<List<OrderModel>> getQuotedOrdersStream(String partnerId) {
+    // if(kDebugMode){
+    //   // You might want to filter MockOrders here to only include quoted ones
+    //   return Stream.value(MockOrders.allOrders.where((order) => order.status == OrderStatus.quoteReady).toList());
+    // }
+    _log.i('Streaming quoted orders for partner: $partnerId');
+    try {
+      return _firestoreRepo
+          .getCollectionStream(
+        _collectionPath,
+        where: [
+          QueryCondition('partnerId', isEqualTo: partnerId),
+          QueryCondition('status', isEqualTo: OrderStatus.quoteReady.name)
+        ],
+        orderBy: [const OrderBy('createdAt', descending: true)],
+      )
+          .map((snapshot) {
+        final orders = snapshot.docs.map((doc) => OrderModel.fromMap(doc.data())).toList();
+        _log.i('Stream emitted ${orders.length} quoted orders.');
+        return orders;
+      });
+    } catch (e, stackTrace) {
+      _log.e('Failed to set up quoted order stream', e, stackTrace);
+      throw Exception('An error occurred while setting up the quoted order stream.');
     }
   }
   

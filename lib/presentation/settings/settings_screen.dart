@@ -1,101 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:suefery_partner/core/l10n/app_localizations.dart';
-import 'package:suefery_partner/presentation/auth/auth_cubit.dart';
-import 'package:suefery_partner/core/l10n/l10n_extension.dart';
-import 'package:suefery_partner/presentation/profile/profile_screen.dart';
-import 'package:suefery_partner/presentation/settings/settings_cubit.dart';
+import 'package:suefery_partner/main.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final strings = context.l10n;
+    final strings = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(strings.settingsTitle),
+        title: Text(strings!.settingsTitle),
       ),
-      body: MultiBlocProvider(
-        providers: [
-          BlocProvider.value(value: context.read<SettingsCubit>()),
-          BlocProvider.value(value: context.read<AuthCubit>()),
+      body: ListView(
+        children: [
+          ListTile(
+            title: Text(strings.changeLanguage),
+            subtitle: Text(strings.currentLanguage(localeNotifier.value?.languageCode ?? 'en')),
+            onTap: () {
+              _showLanguageDialog(context, strings);
+            },
+          ),
+          // Add more settings options here (e.g., theme, notifications)
         ],
-        child: BlocBuilder<SettingsCubit, SettingsState>(
-          builder: (context, state) {
-            final settingsCubit = context.read<SettingsCubit>();
-            return ListView(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.account_circle_outlined),
-                  title: Text(strings.profileTitle),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                    );
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.language),
-                  title: Text(strings.changeLanguage),
-                  subtitle: Text(strings.currentLanguage(state.locale.languageCode)),
-                  onTap: () => _showLanguagePickerDialog(context, settingsCubit),
-                ),
-                SwitchListTile(
-                  title: Text(strings.darkMode),
-                  value: state.themeMode == ThemeMode.dark,
-                  onChanged: (isDark) => settingsCubit.toggleTheme(),
-                  secondary: const Icon(Icons.dark_mode_outlined),
-                ),
-                const Divider(),
-                ListTile(
-                  leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-                  title: Text(
-                    strings.logout,
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                    context.read<AuthCubit>().signOut();
-                  },
-                ),
-              ],
-            );
-          },
-        ),
       ),
     );
   }
 
-  void _showLanguagePickerDialog(
-      BuildContext context, SettingsCubit settingsCubit) {
-    final l10n = context.l10n;
+  void _showLanguageDialog(BuildContext context, AppLocalizations? strings) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SimpleDialog(
-          title: Text(l10n.selectLanguage),
-          children: AppLocalizations.supportedLocales.map((locale) {
-            return SimpleDialogOption(
-              onPressed: () {
-                settingsCubit.setLocale(locale);
-                Navigator.pop(context); // Close the dialog
+        return AlertDialog(
+          title: Text(strings!.selectLanguage),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: AppLocalizations.supportedLocales.length,
+              separatorBuilder: (BuildContext context, int index) => const Divider(),
+              itemBuilder: (BuildContext context, int index) {
+                final locale = AppLocalizations.supportedLocales[index];
+                return ListTile(
+                  title: Text(locale.languageCode),
+                  onTap: () {
+                    localeNotifier.setLocale(locale);
+                    Navigator.pop(context);
+                  },
+                );
               },
-              child: Text(
-                locale.languageCode == 'en' ? 'English' : 'العربية',
-                style: TextStyle(
-                  fontWeight: settingsCubit.state.locale == locale
-                      ? FontWeight.bold
-                      : FontWeight.normal,
-                  color: settingsCubit.state.locale == locale
-                      ? Theme.of(context).primaryColor
-                      : null,
-                ),
-              ),
-            );
-          }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(strings.cancel),
+            ),
+          ],
         );
       },
     );

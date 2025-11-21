@@ -7,6 +7,7 @@ import 'package:suefery_partner/locator.dart';
 
 import '../../data/models/product_model.dart';
 import '../../data/services/inventory_service.dart';
+import '../../data/services/logging_service.dart';
 
 class InventoryState {
 
@@ -39,15 +40,18 @@ class InventoryCubit extends Cubit<InventoryState> {
   final InventoryService _inventoryService = sl<InventoryService>();
   StreamSubscription? _productsSubscription;
   String? _currentStoreId;
-
+  final _log = LoggerRepo('InventoryCubit');
   InventoryCubit() : super(InventoryState());
 
   void fetchInventory(String storeId) {
     _currentStoreId = storeId;
+    _log.i('Fetching inventory for store $storeId');
+    _productsSubscription?.cancel();
     emit(state.copyWith(isLoading: true));
     _productsSubscription?.cancel();
     _productsSubscription = _inventoryService.getProductsStream(storeId).listen(
       (products) {
+        _log.i('fetched inventory for store ${products.length} products');
         emit(state.copyWith(products: products, isLoading: false, error: ''));
       },
       onError: (e) => emit(state.copyWith(error: e.toString(), isLoading: false)),
@@ -85,8 +89,14 @@ class InventoryCubit extends Cubit<InventoryState> {
     if (_currentStoreId == null) return;
     try {
 
-      await _inventoryService.updateProduct(ProductModel(
-        id: productId, storeId: _authService.currentFirebaseUser!.uid, description: description, brand: brand, price: price
+      await _inventoryService.updateProduct(
+        ProductModel(
+          id: productId, 
+          storeId: _authService.currentFirebaseUser!.uid, 
+          description: 
+          description, 
+          brand: brand, 
+          price: price
         )
       );
     } catch (e) {

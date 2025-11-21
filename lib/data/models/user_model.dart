@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:suefery_partner/core/extensions/is_not_null_or_empty.dart';
 
 import '../enums/partner_status.dart';
 import '../enums/user_role.dart';
@@ -21,11 +22,13 @@ class UserModel extends Equatable {
   final bool isVerified;
   final DateTime? creationTimestamp;
   final String? photoUrl;
+  final String? storeName;
   final List<String>? tags;
   final String? bio;
   final String? website;
   final PartnerStatus partnerStatus;
-  final Map<String , double>? location ;
+  final double? lat;
+  final double? lng;
   final String? geohash;
   final String? storeId; 
   final String? fcmToken;
@@ -46,11 +49,13 @@ class UserModel extends Equatable {
     this.isVerified = false,
     this.creationTimestamp,
     this.photoUrl,
+    this.storeName,
     this.tags = const [],
     this.bio,
     this.website,
     this.partnerStatus = PartnerStatus.inactive,
-    this.location = const {},
+    this.lat,
+    this.lng,
     this.geohash = "",
     required this.storeId,
     this.fcmToken,
@@ -79,11 +84,13 @@ class UserModel extends Equatable {
       isVerified: firebaseUser.emailVerified,
       creationTimestamp: firebaseUser.metadata.creationTime ??DateTime.now(),
       photoUrl: firebaseUser.photoURL,
+      storeName: "",
       tags: [],
       bio: "",
       website: "",
       partnerStatus: PartnerStatus.inactive,
-      location: {},
+      lat: 0,
+      lng: 0,
       geohash: "",
       storeId: "",
       fcmToken: "",
@@ -108,12 +115,14 @@ class UserModel extends Equatable {
       isVerified: map['isVerified']!=null ? map['isVerified']as bool:false,
       creationTimestamp: (map['creationTimestamp'] as Timestamp?)?.toDate(),
       photoUrl: map['photoUrl'] as String?,
+      storeName: map['storeName'] as String?,
       tags: (map['tags'] as List<dynamic>?)?.cast<String>() ?? [],
       bio: map['bio'] as String?,
       website: map['website'] as String?,
       partnerStatus: PartnerStatus.values
           .firstWhere((e) => e.name == map['status'], orElse: () => PartnerStatus.inactive),
-      location: map['location'] as Map<String, double>?,
+      lat: map['lat'] as double?,
+      lng: map['lng'] as double?,
       geohash: map['geohash'] as String?,
       storeId: map['storeId'] as String?,
       fcmToken: map['fcmToken'] as String?,
@@ -139,11 +148,13 @@ class UserModel extends Equatable {
           ? Timestamp.fromDate(creationTimestamp!)
           : FieldValue.serverTimestamp(),
       'photoUrl': photoUrl,
+      'storeName': storeName,
       'tags': tags,
       'bio': bio,
       'website': website,
-      'status': partnerStatus,
-      'location': location,
+      'status': partnerStatus.name,
+      'lat': lat,
+      'lng': lng,
       'geohash': geohash,
       'storeId': storeId,
       'fcmToken': fcmToken,
@@ -166,11 +177,13 @@ class UserModel extends Equatable {
   bool? isVerified,
   DateTime? creationTimestamp,
   String? photoUrl,
+  String? storeName,
   List<String>? tags,
   String? bio,
    String? website,
   PartnerStatus? partnerStatus,
-  Map<String , double>? location ,
+  double? lat,
+  double? lng,
   String? geohash,
   String? storeId,
   String? fcmToken,
@@ -192,12 +205,14 @@ class UserModel extends Equatable {
       specificPersonaGoal: specificPersonaGoal ?? this.specificPersonaGoal,
       creationTimestamp: creationTimestamp ?? this.creationTimestamp,
       photoUrl: photoUrl ?? this.photoUrl,
+      storeName: storeName ?? this.storeName,
       //This is what you filter by (e.g., "grocery", "pharmacy").
       tags: tags ?? this.tags,
       bio: bio ?? this.bio,
       website: website ?? this.website,
       partnerStatus: partnerStatus ?? this.partnerStatus,
-      location: location ?? this.location,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
       // represents a geographic bounding box. 
       //It is the standard, high-performance way to perform geospatial queries in Firestore
       geohash: geohash ?? this.geohash,
@@ -206,10 +221,14 @@ class UserModel extends Equatable {
     );
   }
 
+  bool get isSetupComplete {
+    return address.isNotNullOrEmpty && city.isNotNullOrEmpty;
+  }
+
   @override
   List<Object?> get props => [
     id,role ,email, phone, firstName, lastName, isVerified, address, city, 
     country, postalCode, state, specificPersonaGoal, creationTimestamp, photoUrl, tags, 
-    bio, website, partnerStatus, location, geohash, storeId, fcmToken
+    bio, website, partnerStatus, lat,lng, geohash, storeId, fcmToken,storeName
   ];
 }

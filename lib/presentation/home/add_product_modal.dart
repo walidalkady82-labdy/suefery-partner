@@ -21,7 +21,6 @@ class _AddProductModalState extends State<AddProductModal> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // MODIFIED: Call InventoryCubit
       context.read<InventoryCubit>().addProduct(_productDescription,_productBrand, _productPrice);
       Navigator.pop(context);
     }

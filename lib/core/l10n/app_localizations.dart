@@ -383,7 +383,7 @@ abstract class AppLocalizations {
   /// Generic navigation text to the signup page.
   ///
   /// In en, this message translates to:
-  /// **'To Signup'**
+  /// **'Don\'t have an account? Sign Up'**
   String get toSignup;
 
   /// Generic navigation text to the login page.
@@ -775,6 +775,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please type DELETE to confirm.'**
   String get deleteAccountHint;
+
+  /// Display title of setup store screen
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Your Store'**
+  String get setupStoreScreenTitle;
+
+  /// Display message of setup store screen
+  ///
+  /// In en, this message translates to:
+  /// **'One Last Step!'**
+  String get setupStoreMainMessage;
+
+  /// Display message of setup store screen
+  ///
+  /// In en, this message translates to:
+  /// **'We need your store details to connect you with customers nearby.'**
+  String get setupStoreMain1Message;
+
+  /// Display label of store name
+  ///
+  /// In en, this message translates to:
+  /// **'Store Name'**
+  String get storeNameLabel;
+
+  /// No description provided for @setupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Your Store'**
+  String get setupTitle;
+
+  /// No description provided for @stepInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get stepInfo;
+
+  /// No description provided for @stepLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get stepLocation;
+
+  /// No description provided for @stepTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get stepTags;
+
+  /// No description provided for @oneLastStep.
+  ///
+  /// In en, this message translates to:
+  /// **'One Last Step!'**
+  String get oneLastStep;
+
+  /// No description provided for @setupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We need your store details to connect you with customers nearby.'**
+  String get setupSubtitle;
+
+  /// No description provided for @storeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Name'**
+  String get storeName;
+
+  /// No description provided for @bioLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio / Slogan'**
+  String get bioLabel;
+
+  /// No description provided for @websiteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Website (Optional)'**
+  String get websiteLabel;
+
+  /// No description provided for @coordsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates (Lat/Lng)'**
+  String get coordsLabel;
+
+  /// No description provided for @coordTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: Use Google Maps to find your exact coordinates.'**
+  String get coordTip;
+
+  /// No description provided for @tagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you sell?'**
+  String get tagsTitle;
+
+  /// No description provided for @tagsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Grocery, Pharmacy, Snacks'**
+  String get tagsSubtitle;
+
+  /// No description provided for @addTagHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a tag...'**
+  String get addTagHint;
+
+  /// No description provided for @noTags.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags added yet.'**
+  String get noTags;
+
+  /// No description provided for @completeSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Setup'**
+  String get completeSetup;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @revenueThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue (Month)'**
+  String get revenueThisMonth;
+
+  /// No description provided for @totalOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Orders'**
+  String get totalOrders;
+
+  /// No description provided for @mostWantedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Most Wanted Items'**
+  String get mostWantedItems;
+
+  /// No description provided for @noDataYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available yet.'**
+  String get noDataYet;
+
+  /// No description provided for @partnerPerformance.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner Score'**
+  String get partnerPerformance;
+
+  /// No description provided for @statusExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get statusExcellent;
+
+  /// No description provided for @statusGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get statusGood;
+
+  /// No description provided for @statusAtRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'At Risk'**
+  String get statusAtRisk;
+
+  /// No description provided for @fulfillmentRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Fulfillment Rate'**
+  String get fulfillmentRate;
+
+  /// No description provided for @keepItUp.
+  ///
+  /// In en, this message translates to:
+  /// **'High fulfillment boosts your ranking in S3 Dispatch.'**
+  String get keepItUp;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @tabAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis'**
+  String get tabAnalysis;
 }
 
 class _AppLocalizationsDelegate

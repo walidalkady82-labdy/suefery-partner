@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:suefery_partner/data/models/product_model.dart';
 import 'package:suefery_partner/data/repositories/i_repo_firestore.dart';
 import 'package:suefery_partner/data/services/logging_service.dart';
@@ -14,7 +15,7 @@ class InventoryService {
   Stream<List<ProductModel>> getProductsStream(String storeId) {
     return  _firestoreRepo.getCollectionStream( _collectionPath,
         where: [QueryCondition('storeId', isEqualTo: storeId)],
-        orderBy: [OrderBy('name')]).map((snapshot) => snapshot.docs
+        orderBy: [OrderBy('description')]).map((snapshot) => snapshot.docs
             .map((doc) => ProductModel.fromMap(doc.data()))
             .toList());
   }
@@ -79,6 +80,59 @@ class InventoryService {
     } catch (e, stackTrace) {
       _log.e('Batch update failed', e, stackTrace);
       throw Exception('An error occurred during the bulk update.');
+    }
+  }
+
+  /// NEW: "Harvesting" Logic
+  /// Checks if a product exists by name/brand. 
+  /// If it exists -> Update Price & set Available.
+  /// If new -> Create it.
+  Future<void> syncItemFromQuote({
+    required String storeId,
+    required String description, // Item Name
+    required String brand, // If available from order
+    required double price,
+  }) async {
+    try {
+      // 1. Normalize text for searching (avoid "Pepsi" vs "pepsi" duplicates)
+      final searchKey = description.trim().toLowerCase();
+
+      // 2. Check if this item already exists in this store's inventory
+      // Note: This requires a composite index on storeId + description in Firestore console
+      final querySnapshot = await _firestoreRepo.getCollection(
+          _collectionPath,
+          where: [
+            QueryCondition('storeId', isEqualTo: storeId),
+            QueryCondition('description', isEqualTo: searchKey),
+          ],
+          limit: 1
+          );
+      if (querySnapshot.isNotEmpty) {
+        // --- UPDATE EXISTING ---
+        final docId = querySnapshot.first.id;
+        await _firestoreRepo.updateDocument(_collectionPath, docId, {
+          'unitPrice': price, // Update to latest quoted price
+          'isAvailable': true, // Partner just quoted it, so they definitely have it
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // --- CREATE NEW ---
+        final newProduct = ProductModel(
+          id: '', // Firestore will gen ID
+          storeId: storeId,
+          description: description,
+          brand: brand.isEmpty ? 'generic' : brand,
+          price: price,
+          isAvailable: true,
+          createdAt: DateTime.now(),
+        );
+        
+        // Add() automatically generates a document ID
+        await _firestoreRepo.addDocument(_collectionPath,newProduct.toMap());
+      }
+    } catch (e) {
+      // We generally log this but don't crash the app if inventory sync fails
+      _log.e("Inventory Sync Error: $e"); 
     }
   }
 }
